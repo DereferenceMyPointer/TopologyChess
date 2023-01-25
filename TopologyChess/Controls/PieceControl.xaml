@@ -1,0 +1,144 @@
+﻿<UserControl x:Class="TopologyChess.Controls.PieceControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:controls="clr-namespace:TopologyChess.Controls"
+             mc:Ignorable="d" >
+    <UserControl.Resources>
+        <Style TargetType="Image" x:Key="wP">
+            <Setter Property="Visibility" Value="Collapsed" />
+            <Setter Property="Source" Value="{StaticResource wPDrawingImage}" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding PieceType, RelativeSource={RelativeSource AncestorType=UserControl}}" Value="WhitePawn">
+                    <Setter Property="Visibility" Value="Visible"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        <Style TargetType="Image" x:Key="bP">
+            <Setter Property="Visibility" Value="Collapsed" />
+            <Setter Property="Source" Value="{StaticResource bPDrawingImage}" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding PieceType, RelativeSource={RelativeSource AncestorType=UserControl}}" Value="BlackPawn">
+                    <Setter Property="Visibility" Value="Visible"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        <Style TargetType="Image" x:Key="wN">
+            <Setter Property="Visibility" Value="Collapsed" />
+            <Setter Property="Source" Value="{StaticResource wNDrawingImage}" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding PieceType, RelativeSource={RelativeSource AncestorType=UserControl}}" Value="WhiteKnight">
+                    <Setter Property="Visibility" Value="Visible"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        <Style TargetType="Image" x:Key="bN">
+            <Setter Property="Visibility" Value="Collapsed" />
+            <Setter Property="Source" Value="{StaticResource bNDrawingImage}" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding PieceType, RelativeSource={RelativeSource AncestorType=UserControl}}" Value="BlackKnight">
+                    <Setter Property="Visibility" Value="Visible"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        <Style TargetType="Image" x:Key="wB">
+            <Setter Property="Visibility" Value="Collapsed" />
+            <Setter Property="Source" Value="{StaticResource wBDrawingImage}" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding PieceType, RelativeSource={RelativeSource AncestorType=UserControl}}" Value="WhiteBishop">
+                    <Setter Property="Visibility" Value="Visible"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        <Style TargetType="Image" x:Key="bB">
+            <Setter Property="Visibility" Value="Collapsed" />
+            <Setter Property="Source" Value="{StaticResource bBDrawingImage}" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding PieceType, RelativeSource={RelativeSource AncestorType=UserControl}}" Value="BlackBishop">
+                    <Setter Property="Visibility" Value="Visible"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        <Style TargetType="Image" x:Key="wR">
+            <Setter Property="Visibility" Value="Collapsed" />
+            <Setter Property="Source" Value="{StaticResource wRDrawingImage}" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding PieceType, RelativeSource={RelativeSource AncestorType=UserControl}}" Value="WhiteRook">
+                    <Setter Property="Visibility" Value="Visible"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        <Style TargetType="Image" x:Key="bR">
+            <Setter Property="Visibility" Value="Collapsed" />
+            <Setter Property="Source" Value="{StaticResource bRDrawingImage}" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding PieceType, RelativeSource={RelativeSource AncestorType=UserControl}}" Value="BlackRook">
+                    <Setter Property="Visibility" Value="Visible"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        <Style TargetType="Image" x:Key="wQ">
+            <Setter Property="Visibility" Value="Collapsed" />
+            <Setter Property="Source" Value="{StaticResource wQDrawingImage}" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding PieceType, RelativeSource={RelativeSource AncestorType=UserControl}}" Value="WhiteQueen">
+                    <Setter Property="Visibility" Value="Visible"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        <Style TargetType="Image" x:Key="bQ">
+            <Setter Property="Visibility" Value="Collapsed" />
+            <Setter Property="Source" Value="{StaticResource bQDrawingImage}" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding PieceType, RelativeSource={RelativeSource AncestorType=UserControl}}" Value="BlackQueen">
+                    <Setter Property="Visibility" Value="Visible"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        <Style TargetType="Image" x:Key="wK">
+            <Setter Property="Visibility" Value="Collapsed" />
+            <Setter Property="Source" Value="{StaticResource wKDrawingImage}" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding PieceType, RelativeSource={RelativeSource AncestorType=UserControl}}" Value="WhiteKing">
+                    <Setter Property="Visibility" Value="Visible"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        <Style TargetType="Image" x:Key="bK">
+            <Setter Property="Visibility" Value="Collapsed" />
+            <Setter Property="Source" Value="{StaticResource bKDrawingImage}" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding PieceType, RelativeSource={RelativeSource AncestorType=UserControl}}" Value="BlackKing">
+                    <Setter Property="Visibility" Value="Visible"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        
+        <Style TargetType="controls:PieceControl">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate>
+                        <Viewbox>
+                            <Grid>
+                                <Image Style="{StaticResource wP}" />
+                                <Image Style="{StaticResource bP}" />
+                                <Image Style="{StaticResource wN}" />
+                                <Image Style="{StaticResource bN}" />
+                                <Image Style="{StaticResource wB}" />
+                                <Image Style="{StaticResource bB}" />
+                                <Image Style="{StaticResource wR}" />
+                                <Image Style="{StaticResource bR}" />
+                                <Image Style="{StaticResource wQ}" />
+                                <Image Style="{StaticResource bQ}" />
+                                <Image Style="{StaticResource wK}" />
+                                <Image Style="{StaticResource bK}" />
+                            </Grid>
+                        </Viewbox>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </UserControl.Resources>
+    <Grid/>
+</UserControl>
