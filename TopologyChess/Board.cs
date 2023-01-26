@@ -8,7 +8,6 @@ namespace TopologyChess
     public class Board : IEnumerable<Cell>
     {
         private readonly Cell[,] board;
-        public Party Perspective { get; set; } = Party.White;
 
         public Cell this[int rank, int file]
         {
@@ -28,6 +27,27 @@ namespace TopologyChess
             for (int i = 0; i < board.GetLength(0); i++)
                 for (int j = 0; j < board.GetLength(1); j++)
                     board[i, j] = new Cell();
+        }
+
+        public HashSet<Move> BasicMoves(int x, int y)
+        {
+            HashSet<Move> moves = new HashSet<Move>();
+            Cell cell = board[x, y];
+            if (cell.PieceType == PieceType.Empty) return moves;
+            Piece piece = cell.Piece;
+            Point pos = new Point(x, y);
+            if (piece.Value != PieceValue.Pawn)
+            {
+                bool once = (piece.Value == PieceValue.Knight || piece.Value == PieceValue.King);
+                List<Point> leads = new List<Point>();
+                foreach (var d in piece.MoveDirections) leads.Add(pos);
+                while (leads.Any())
+                {
+                    
+                    if (once) break;
+                }
+            }
+            return moves;
         }
 
         public IEnumerator<Cell> GetEnumerator()

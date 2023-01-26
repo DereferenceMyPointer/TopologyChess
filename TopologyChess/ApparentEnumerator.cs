@@ -6,7 +6,6 @@ namespace TopologyChess
     internal class ApparentEnumerator : IEnumerator<Cell>
     {
         private readonly Cell[,] area;
-        private readonly Party perspective;
         private readonly int n, L;
         private int k = -1;
 

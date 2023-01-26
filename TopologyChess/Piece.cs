@@ -50,31 +50,28 @@ namespace TopologyChess
         public bool IsFirstMove { get; set; } = false;
 
         public Point Position { get; set; }
-        public Point InternalDirection { get; set; }
+        public Vector InternalDirection { get; set; }
 
-        private static Dictionary<PieceValue, List<Vector>> Directions;
+        private static readonly Dictionary<PieceValue, List<Vector>> PieceMoveDirections;
 
         static Piece()
         {
-            Directions = new Dictionary<PieceValue, List<Vector>>();
+            PieceMoveDirections = new Dictionary<PieceValue, List<Vector>>();
             var rook_moves = new List<Vector>() { new(0, 1), new(0, -1), new(1, 0), new(-1, 0) };
             var bishop_moves = new List<Vector>() { new(1, 1), new(1, -1), new(-1, -1), new(-1, 1) };
             var knight_moves = new List<Vector>() {
                 new(1, 2), new(1, -2), new(-1, -2), new(-1, 2),
                 new(2, 1), new(2, -1), new(-2, -1), new(-2, 1)
             };
-            var queen_moves = new List<Vector>();
-            //??queen_moves = (List<Vector>)rook_moves.Concat(bishop_moves);
-            Directions.Add(PieceValue.Rook, rook_moves);
-            Directions.Add(PieceValue.Bishop, bishop_moves);
-            Directions.Add(PieceValue.Queen, queen_moves);
+            var queen_moves = rook_moves.Union(bishop_moves).ToList();
+            PieceMoveDirections.Add(PieceValue.Pawn, new List<Vector>());
+            PieceMoveDirections.Add(PieceValue.Knight, knight_moves);
+            PieceMoveDirections.Add(PieceValue.Bishop, bishop_moves);
+            PieceMoveDirections.Add(PieceValue.Rook, rook_moves);
+            PieceMoveDirections.Add(PieceValue.Queen, queen_moves);
+            PieceMoveDirections.Add(PieceValue.King, queen_moves);
         }
 
-        public HashSet<Move> Moves { get; set; } = new HashSet<Move>();
-
-        public HashSet<Move> CalcMoves()
-        {
-            return Moves;
-        }
+        public List<Vector> MoveDirections => PieceMoveDirections[Value];
     }
 }
