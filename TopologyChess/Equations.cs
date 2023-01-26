@@ -42,6 +42,14 @@ namespace TopologyChess
             0.5 * Sin(Tau * v)
         );
 
+        public static Point3D Bicone(double u, double v)
+        {
+            double h = u - v;
+            if (Abs(h) == 1) return new Point3D(0, 0, h);
+            double phi = PI * (u + v - 1) / (1 - Abs(h));
+            return new Point3D(-(1 - Abs(h)) * Cos(phi), -(1 - Abs(h)) * Sin(phi), h);
+        }
+
         public static Point3D SphereL(double u, double v)
         {
             double h = u - v;

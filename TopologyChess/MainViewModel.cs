@@ -14,7 +14,7 @@ namespace TopologyChess
     {
         public MainViewModel()
         {
-            TopologyModel.Transform(Mesh, (Point p) => Equations.Globe(p.X, p.Y));
+            TopologyModel.Transform(Mesh, (Point p) => Equations.Bicone(p.X, p.Y));
             BorderPoints = TopologyModel.GetBorder(Mesh);
         }
         
@@ -88,27 +88,27 @@ namespace TopologyChess
         private void SetupBoard()
         {
             Board board = new Board();
-            board[0, 0].Piece = new Piece(PieceValue.Rook, PieceColor.White);
-            board[1, 0].Piece = new Piece(PieceValue.Knight, PieceColor.White);
-            board[2, 0].Piece = new Piece(PieceValue.Bishop, PieceColor.White);
-            board[3, 0].Piece = new Piece(PieceValue.Queen, PieceColor.White);
-            board[4, 0].Piece = new Piece(PieceValue.King, PieceColor.White);
-            board[5, 0].Piece = new Piece(PieceValue.Bishop, PieceColor.White);
-            board[6, 0].Piece = new Piece(PieceValue.Knight, PieceColor.White);
-            board[7, 0].Piece = new Piece(PieceValue.Rook, PieceColor.White);  
+            board[0, 0].Piece = new Piece(PieceValue.Rook, Party.White);
+            board[1, 0].Piece = new Piece(PieceValue.Knight, Party.White);
+            board[2, 0].Piece = new Piece(PieceValue.Bishop, Party.White);
+            board[3, 0].Piece = new Piece(PieceValue.Queen, Party.White);
+            board[4, 0].Piece = new Piece(PieceValue.King, Party.White);
+            board[5, 0].Piece = new Piece(PieceValue.Bishop, Party.White);
+            board[6, 0].Piece = new Piece(PieceValue.Knight, Party.White);
+            board[7, 0].Piece = new Piece(PieceValue.Rook, Party.White);  
             for (int i = 0; i < 8; i++)
             {
-                board[i, 1].Piece = new Piece(PieceValue.Pawn, PieceColor.White);
-                board[i, 6].Piece = new Piece(PieceValue.Pawn, PieceColor.Black);
+                board[i, 1].Piece = new Piece(PieceValue.Pawn, Party.White);
+                board[i, 6].Piece = new Piece(PieceValue.Pawn, Party.Black);
             }
-            board[0, 7].Piece = new Piece(PieceValue.Pawn, PieceColor.Black);
-            board[1, 7].Piece = new Piece(PieceValue.Knight, PieceColor.Black);
-            board[2, 7].Piece = new Piece(PieceValue.Bishop, PieceColor.Black);
-            board[3, 7].Piece = new Piece(PieceValue.Queen, PieceColor.Black);
-            board[4, 7].Piece = new Piece(PieceValue.King, PieceColor.Black);
-            board[5, 7].Piece = new Piece(PieceValue.Bishop, PieceColor.Black);
-            board[6, 7].Piece = new Piece(PieceValue.Knight, PieceColor.Black);
-            board[7, 7].Piece = new Piece(PieceValue.Pawn, PieceColor.Black);
+            board[0, 7].Piece = new Piece(PieceValue.Rook, Party.Black);
+            board[1, 7].Piece = new Piece(PieceValue.Knight, Party.Black);
+            board[2, 7].Piece = new Piece(PieceValue.Bishop, Party.Black);
+            board[3, 7].Piece = new Piece(PieceValue.Queen, Party.Black);
+            board[4, 7].Piece = new Piece(PieceValue.King, Party.Black);
+            board[5, 7].Piece = new Piece(PieceValue.Bishop, Party.Black);
+            board[6, 7].Piece = new Piece(PieceValue.Knight, Party.Black);
+            board[7, 7].Piece = new Piece(PieceValue.Rook, Party.Black);
             Board = board;
         }
 
