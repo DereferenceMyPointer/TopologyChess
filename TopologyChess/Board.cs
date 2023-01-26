@@ -26,7 +26,7 @@ namespace TopologyChess
             board = new Cell[8, 8];
             for (int i = 0; i < board.GetLength(0); i++)
                 for (int j = 0; j < board.GetLength(1); j++)
-                    board[i, j] = new Cell();
+                    board[i, j] = new Cell(i, j);
         }
 
         public HashSet<Move> BasicMoves(int x, int y)

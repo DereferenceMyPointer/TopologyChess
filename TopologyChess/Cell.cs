@@ -9,6 +9,16 @@ namespace TopologyChess
         private bool _selected;
         private bool _highlighted;
 
+        public Cell(int x, int y)
+        {
+            X = x;
+            Y = y;
+        }
+
+        public int X { get; }
+        public int Y { get; }
+        public int Color => (X + Y) % 2;
+
         public Piece Piece
         {
             get => _piece;
