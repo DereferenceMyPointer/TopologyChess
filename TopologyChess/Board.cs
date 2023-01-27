@@ -29,6 +29,22 @@ namespace TopologyChess
                     this[i, j] = new Cell(i, j);
         }
 
+        public HashSet<Move> TestMoves(Cell cell)
+        {
+            HashSet<Move> moves = new HashSet<Move>();
+            if (cell.Piece.Type == PieceType.Empty) return moves;
+            foreach (var d in cell.Piece.MoveDirections)
+            {
+                int x = cell.X + (int)d.X;
+                int y = cell.Y + (int)d.Y;
+                if (0 <= x && x < 8 && 0 <= y && y < 8)
+                {
+                    moves.Add(new Move(cell, this[x, y]));
+                }
+            }
+            return moves;
+        }
+
         public HashSet<Move> BasicMoves(int x, int y)
         {
             HashSet<Move> moves = new HashSet<Move>();

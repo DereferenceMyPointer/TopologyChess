@@ -72,17 +72,25 @@ namespace TopologyChess
 
         public ICommand CellCommand => _cellCommand ??= new RelayCommand(parameter =>
         {
-            Cell cell = (Cell)parameter;
+            Cell clickedCell = (Cell)parameter;
             Cell selectedCell = Board.FirstOrDefault(x => x.Selected);
-            if (selectedCell == null || selectedCell == cell)
+            if (selectedCell == null)
             {
-                cell.Selected = !cell.Selected;
+                clickedCell.Selected = true;
+                foreach (var m in Board.TestMoves(clickedCell))
+                {
+                    m.To.Highlighted = true;
+                }
             }
             else
             {
+                if (clickedCell.Highlighted)
+                {
+                    clickedCell.Piece = selectedCell.Piece;
+                    selectedCell.Piece = Piece.Empty;
+                }
                 selectedCell.Selected = false;
-                cell.Piece = selectedCell.Piece;
-                selectedCell.Piece = Piece.Empty;
+                foreach (Cell c in Board) c.Highlighted = false;
             }
         }, parameter => parameter is Cell cell && (Board.Any(x => x.Selected) || cell.Piece.Type != PieceType.Empty));
 

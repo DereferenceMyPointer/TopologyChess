@@ -26,6 +26,9 @@
                                             <Setter Property="Background" Value="Bisque"/>
                                         </DataTrigger>
                                         <DataTrigger Binding="{Binding Selected}" Value="True">
+                                            <Setter Property="BorderBrush" Value="Lime"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding Highlighted}" Value="True">
                                             <Setter Property="BorderBrush" Value="Red"/>
                                         </DataTrigger>
                                     </Style.Triggers>
