@@ -9,20 +9,21 @@ namespace TopologyChess
 {
     public class Move
     {
-        public Move(Point from, Point to)
+        public Move(Cell from, Cell to)
         {
             From = from;
             To = to;
-
+            MovingPiece = from.Piece;
+            CapturedPiece = To.Piece;
         }
 
-        public Point From { get; set; }
-        public Point To { get; set; }
+        public Cell From { get; set; }
+        public Cell To { get; set; }
         public Piece MovingPiece { get; set; }
-        public Point? Capture { get; set; }
+        public Cell Capture { get; set; }
         public Piece CapturedPiece { get; set; }
-        public Move Castle { get; set; }
-        public Point? EnPassant { get; set; }
 
+        public Move Castle { get; set; }
+        public Cell EnPassant { get; set; }
     }
 }

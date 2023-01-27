@@ -50,7 +50,7 @@ namespace TopologyChess
                 Types[cnct.side1] = cnct.type;
                 Types[cnct.side2] = cnct.type;
             }
-            CreateTransforms();
+            CreateMatrices();
         }
 
         public string Name { get; }
@@ -62,35 +62,32 @@ namespace TopologyChess
         private int[] Connections { get; }
         private int[] Types { get; }
 
-        public Matrix[] PositionWarps = new Matrix[4];
-        public Matrix[] DirectionWarps = new Matrix[4];
+        public Matrix[] WarpMatrices = new Matrix[4];
 
-        private void CreateTransforms()
+        private void CreateMatrices()
         {
             for (int s1 = 0; s1 < 4; s1++)
             {
-                Matrix D = Matrix.Identity;
-                Matrix P = Matrix.Identity;
+                Matrix A = Matrix.Identity;
                 int s2 = Connections[s1];
                 if (s2 == -1) continue;
-                D.Rotate(-90 * s1);
-                P.Rotate(-90 * s1); P.Translate(7 * (s1 / 2), 7 * ((s1 + 1) % 4 / 2));
-                D.Scale(1, -1);
-                P.Scale(1, -1); P.Translate(0, -1);
-                if (Types[s1] == 1)
+                A.Translate(-0.5, -0.5);
+                A.Rotate(-90 * s1);
+                A.Translate(0, 0.5);
+                A.Scale(1, -1);
+                if (Types[s1] % 2 == 1)
                 {
-                    D.Scale(-1, 1);
-                    P.Scale(-1, 1); P.Translate(7, 0);
+                    A.Scale(-1, 1);
                 }
-                else if (Types[s1] == 2)
+                else if (Types[s1] / 2 == 1)
                 {
-                    P.Translate(4, 0);
+                    A.Translate(0.5, 0);
                 }
-                D.Rotate(90 * s2);
-                P.Rotate(90 * s2); P.Translate(7 * ((s2 + 1) % 4 / 2), 7 * (s2 / 2));
+                A.Translate(0, -0.5);
+                A.Rotate(90 * s2);
+                A.Translate(0.5, 0.5);
 
-                DirectionWarps[s1] = D;
-                PositionWarps[s1] = P;
+                WarpMatrices[s1] = A;
             }
         }
 
@@ -101,6 +98,16 @@ namespace TopologyChess
             else if (p.Y > 7) return 2;
             else if (p.X < 0) return 3;
             else return -1;
+        }
+
+        public static List<int> Sides(Point p)
+        {
+            List<int> result = new List<int>();
+            if (p.X < 0) result.Add(3);
+            else if (p.X >= 8) result.Add(1);
+            if (p.Y < 0) result.Add(0);
+            else if (p.Y >= 8) result.Add(2);
+            return result;
         }
     }
 }

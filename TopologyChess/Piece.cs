@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Media;
 
 namespace TopologyChess
 {
@@ -32,6 +33,14 @@ namespace TopologyChess
             Value = value;
             Color = color;
             Type = (PieceType)((int)value * (int)color);
+            MoveDirections = PieceMoveDirections[Value];
+            if (Type == PieceType.BlackPawn)
+            {
+                for (int i = 0; i < 3; i++)
+                {
+                    MoveDirections[i] = -MoveDirections[i];
+                }
+            }
         }
 
         public Piece(PieceType type)
@@ -39,6 +48,14 @@ namespace TopologyChess
             Value = (PieceValue)Math.Abs((int)type);
             Color = (Party)Math.Sign((int)type);
             Type = type;
+            MoveDirections = PieceMoveDirections[Value];
+            if (Type == PieceType.BlackPawn)
+            {
+                for (int i = 0; i < 3; i++)
+                {
+                    MoveDirections[i] = -MoveDirections[i];
+                }
+            }
         }
 
         public PieceValue Value { get; }
@@ -47,10 +64,9 @@ namespace TopologyChess
         public PieceType Type { get; }
 
         public bool HasMoved { get; set; } = false;
-        public bool IsFirstMove { get; set; } = false;
 
         public Point Position { get; set; }
-        public Vector InternalDirection { get; set; }
+        public Matrix RenderMatrix { get; set; } = Matrix.Identity;
 
         private static readonly Dictionary<PieceValue, List<Vector>> PieceMoveDirections;
 
@@ -63,15 +79,20 @@ namespace TopologyChess
                 new(1, 2), new(1, -2), new(-1, -2), new(-1, 2),
                 new(2, 1), new(2, -1), new(-2, -1), new(-2, 1)
             };
+            var pawn_moves = new List<Vector>() { new(0, 1), new(-1, 1), new(1, 1) };
             var queen_moves = rook_moves.Union(bishop_moves).ToList();
-            PieceMoveDirections.Add(PieceValue.Pawn, new List<Vector>());
+            PieceMoveDirections.Add(PieceValue.None, new List<Vector>());
+            PieceMoveDirections.Add(PieceValue.Pawn, pawn_moves);
             PieceMoveDirections.Add(PieceValue.Knight, knight_moves);
             PieceMoveDirections.Add(PieceValue.Bishop, bishop_moves);
             PieceMoveDirections.Add(PieceValue.Rook, rook_moves);
             PieceMoveDirections.Add(PieceValue.Queen, queen_moves);
             PieceMoveDirections.Add(PieceValue.King, queen_moves);
+            Empty = new Piece(PieceType.Empty);
         }
 
-        public List<Vector> MoveDirections => PieceMoveDirections[Value];
+        public List<Vector> MoveDirections { get; set; }
+
+        public static Piece Empty;
     }
 }

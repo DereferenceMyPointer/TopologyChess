@@ -6,6 +6,7 @@ using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Media;
 using System.Windows.Media.Media3D;
 
 namespace TopologyChess
@@ -81,9 +82,9 @@ namespace TopologyChess
             {
                 selectedCell.Selected = false;
                 cell.Piece = selectedCell.Piece;
-                selectedCell.Piece = null;
+                selectedCell.Piece = Piece.Empty;
             }
-        }, parameter => parameter is Cell cell && (Board.Any(x => x.Selected) || cell.PieceType != PieceType.Empty));
+        }, parameter => parameter is Cell cell && (Board.Any(x => x.Selected) || cell.Piece.Type != PieceType.Empty));
 
         private void SetupBoard()
         {

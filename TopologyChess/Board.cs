@@ -7,35 +7,35 @@ namespace TopologyChess
 {
     public class Board : IEnumerable<Cell>
     {
-        private readonly Cell[,] board;
+        private readonly Cell[,] _board;
 
         public Cell this[int rank, int file]
         {
-            get => board[rank, file];
-            set => board[rank, file] = value;
+            get => _board[7 - file, rank];
+            set => _board[7 - file, rank] = value;
         }
 
         public Cell this[Point point]
         {
-            get => board[(int)point.X, (int)point.Y];
-            set => board[(int)point.X, (int)point.Y] = value;
+            get => this[(int)(point.X - 0.5), (int)(point.Y - 0.5)];
+            set => this[(int)(point.X - 0.5), (int)(point.Y - 0.5)] = value;
         }
 
         public Board()
         {
-            board = new Cell[8, 8];
-            for (int i = 0; i < board.GetLength(0); i++)
-                for (int j = 0; j < board.GetLength(1); j++)
-                    board[i, j] = new Cell(i, j);
+            _board = new Cell[8, 8];
+            for (int i = 0; i < 8; i++)
+                for (int j = 0; j < 8; j++)
+                    this[i, j] = new Cell(i, j);
         }
 
         public HashSet<Move> BasicMoves(int x, int y)
         {
             HashSet<Move> moves = new HashSet<Move>();
-            Cell cell = board[x, y];
-            if (cell.PieceType == PieceType.Empty) return moves;
+            Cell cell = this[x, y];
+            if (cell.Piece.Type == PieceType.Empty) return moves;
             Piece piece = cell.Piece;
-            Point pos = new Point(x, y);
+            Point pos = new Point(x + 0.5, y + 0.5);
             if (piece.Value != PieceValue.Pawn)
             {
                 bool once = (piece.Value == PieceValue.Knight || piece.Value == PieceValue.King);
@@ -51,9 +51,9 @@ namespace TopologyChess
         }
 
         public IEnumerator<Cell> GetEnumerator()
-            => new ApparentEnumerator(board);
+            => _board.Cast<Cell>().GetEnumerator();
 
         IEnumerator IEnumerable.GetEnumerator()
-            => new ApparentEnumerator(board);
+            => _board.GetEnumerator();
     }
 }
