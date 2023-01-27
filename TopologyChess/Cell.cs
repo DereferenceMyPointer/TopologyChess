@@ -9,19 +9,26 @@ namespace TopologyChess
         private bool _selected;
         private bool _highlighted;
 
+        public Cell(int x, int y)
+        {
+            X = x;
+            Y = y;
+            Color = (x + y) % 2;
+            Piece = Piece.Empty;
+        }
+
+        public int X { get; }
+        public int Y { get; }
+        public int Color { get; }
+
         public Piece Piece
         {
             get => _piece;
             set
             {
                 _piece = value;
-                OnPropertyChanged(nameof(PieceType));
+                OnPropertyChanged();
             }
-        }
-
-        public PieceType PieceType
-        {
-            get => _piece?.Type ?? PieceType.Empty;
         }
 
         public bool Selected

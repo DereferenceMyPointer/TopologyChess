@@ -13,10 +13,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Page Remove="Controls\Copy.xaml" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="3DTools" Version="1.0.0" />
   </ItemGroup>
 
