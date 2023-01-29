@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Windows;
 using System.Linq;
 using System.Windows.Media;
+using System;
 
 namespace TopologyChess
 {
@@ -18,8 +19,8 @@ namespace TopologyChess
 
         public Cell this[Point point]
         {
-            get => this[(int)point.X, (int)point.Y];
-            set => this[(int)point.X, (int)point.Y] = value;
+            get => this[Convert.ToInt32(point.X), Convert.ToInt32(point.Y)];
+            set => this[Convert.ToInt32(point.X), Convert.ToInt32(point.Y)] = value;
         }
 
         public int Size { get; set; }
@@ -66,9 +67,13 @@ namespace TopologyChess
                 foreach (var d in from.Piece.MoveDirections) leads.Add(
                     new Chain<Step>(new Step(from.Position, d, Matrix.Identity))
                 );
+                int iter = 0;
                 do
                 {
-                    leads.Sort((a, b) => (OutOfBounds(a.Value.P) ? 1 : 0) - (OutOfBounds(b.Value.P) ? 1 : 0));
+                    leads.Sort((a, b) =>
+                        Topology.Sides(a.Value.P, Size).Count -
+                        Topology.Sides(b.Value.P, Size).Count
+                    );
                     foreach (var lead in leads)
                     {
                         Step next = lead.Value;
@@ -87,7 +92,7 @@ namespace TopologyChess
                         to.Move ??= new Move(from, to, lead);
                     }
                     new_leads.Clear();
-                } while (!once && leads.Any());
+                } while (!once && leads.Any() && iter++ < Size * Size);
             }
             else
             {
@@ -122,11 +127,11 @@ namespace TopologyChess
                     next.P += next.V;
                     foreach (Step warp in CurrentTopology.Warp(next, Size))
                     {
-                        take = take.Add(warp);
-                        Cell to = this[take.Value.P];
+                        Chain<Step> take1 = take.Add(warp);
+                        Cell to = this[take1.Value.P];
                         if (to.Piece.Color != pawn.Color && (to.Piece.Color != Party.None || to == enPassant))
                         {
-                            to.Move ??= new Move(from, to, take);
+                            to.Move ??= new Move(from, to, take1);
                             if (to == enPassant) to.Move.Capture = LastMove.To;
                         }
                     }

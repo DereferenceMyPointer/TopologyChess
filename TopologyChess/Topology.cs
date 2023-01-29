@@ -14,14 +14,14 @@ namespace TopologyChess
         public static List<Topology> Topologies = new List<Topology>()
         {
             new Topology("Flat"),
-            new Topology("Cylinder Horizontal", (0, 2, 1)),
-            new Topology("Cylinder Vertical", (1, 3, 1)),
-            new Topology("Moebius Horizontal", (0, 2, 0)),
-            new Topology("Moebius Vertical", (1, 3, 0)),
+            new Topology("Cylinder Horizontal", (1, 3, 1)),
+            new Topology("Cylinder Vertical", (0, 2, 1)),
+            new Topology("Moebius Horizontal", (1, 3, 0)),
+            new Topology("Moebius Vertical", (0, 2, 0)),
             new Topology("Torus", (1, 3, 1), (0, 2, 1)),
             new Topology("Projective Plane", (1, 3, 0), (0, 2, 0)),
-            new Topology("Klein Vertical", (1, 3, 0), (0, 2, 1)),
-            new Topology("Klein Horizontal", (1, 3, 1), (0, 2, 0)),
+            new Topology("Klein Vertical", (1, 3, 1), (0, 2, 0)),
+            new Topology("Klein Horizontal", (1, 3, 0), (0, 2, 1)),
             new Topology("Globe Vertical", (1, 3, 1), (0, 0, 2), (2, 2, 2)),
             new Topology("Globe Horizontal", (0, 2, 1), (1, 1, 2), (3, 3, 2)),
             new Topology("Pillow Vertical", (1, 3, 1), (0, 0, 1), (2, 2, 1)),
@@ -58,8 +58,8 @@ namespace TopologyChess
 
         public List<(int, int, int)> ConnectionList { get; }
 
-        private int[] Connections { get; }
-        private int[] Types { get; }
+        public int[] Connections { get; }
+        public int[] Types { get; }
 
         public Matrix[] WarpMatrices = new Matrix[4];
 
@@ -86,6 +86,9 @@ namespace TopologyChess
                 A.Rotate(90 * s2);
                 A.Translate(0.5, 0.5);
 
+                A.M11 = Math.Round(A.M11); A.M12 = Math.Round(A.M12);
+                A.M21 = Math.Round(A.M21); A.M22 = Math.Round(A.M22);
+                A.OffsetX = Math.Round(A.OffsetX); A.OffsetY = Math.Round(A.OffsetY);
                 WarpMatrices[s1] = A;
             }
         }
@@ -93,10 +96,10 @@ namespace TopologyChess
         public static List<int> Sides(Point p, int size)
         {
             List<int> result = new List<int>();
-            if (p.X < 0) result.Add(3);
-            else if (p.X >= size) result.Add(1);
-            if (p.Y < 0) result.Add(0);
-            else if (p.Y >= size) result.Add(2);
+            if (p.X < -0.5) result.Add(3);
+            else if (p.X >= size - 0.5) result.Add(1);
+            if (p.Y < -0.5) result.Add(0);
+            else if (p.Y >= size - 0.5) result.Add(2);
             return result;
         }
 

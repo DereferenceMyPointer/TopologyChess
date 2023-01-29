@@ -43,8 +43,10 @@
                                     <Setter Property="Template">
                                         <Setter.Value>
                                             <ControlTemplate>
-                                                <Border Background="{TemplateBinding Background}" >
-                                                    <Border BorderThickness="{TemplateBinding BorderThickness}" BorderBrush="{TemplateBinding BorderBrush}">
+                                                <Border Background="{TemplateBinding Background}">
+                                                    <Grid>
+                                                        <Border Opacity="0.2" BorderThickness="{TemplateBinding BorderThickness}"
+                                                                BorderBrush="{x:Null}" Background="{TemplateBinding BorderBrush}"/>
                                                         <Image>
                                                             <Image.Style>
                                                                 <Style TargetType="Image">
@@ -95,7 +97,7 @@
                                                                 </Style>
                                                             </Image.Style>
                                                         </Image>
-                                                    </Border>
+                                                    </Grid>
                                                 </Border>
                                             </ControlTemplate>
                                         </Setter.Value>

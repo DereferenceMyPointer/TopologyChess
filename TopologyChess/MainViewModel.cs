@@ -76,6 +76,13 @@ namespace TopologyChess
         {
             SetupBoard();
             Board.CurrentTopology = Topology.Topologies.FirstOrDefault(t => t.Name == "Cylinder Horizontal");
+            var top = Board.CurrentTopology;
+            string str = "";
+            for (int i = 0; i < 4; i++)
+            {
+                str += i.ToString() + ":\n" + top.Connections[i].ToString() + " " + top.WarpMatrices[i] + "\n\n";
+            }
+            MessageBox.Show(str);
         });
 
         public ICommand ClearCommand => _clearCommand ??= new RelayCommand(parameter =>
