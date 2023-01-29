@@ -49,24 +49,24 @@ namespace TopologyChess
             switch (Value)
             {
                 case PieceValue.Pawn:
-                    int d = (int)Color;
-                    MoveDirections = new List<Vector> { new(-1, d), new(0, d), new(1, d) };
+                    int d = -(int)Color;
+                    MoveDirections = new Vector[] { new(-1, d), new(0, d), new(1, d) };
                     break;
                 case PieceValue.Knight:
-                    MoveDirections = new List<Vector> {
+                    MoveDirections = new Vector[] {
                         new(1, 2), new(1, -2), new(-1, -2), new(-1, 2),
                         new(2, 1), new(2, -1), new(-2, -1), new(-2, 1)
                     };
                     break;
                 case PieceValue.Bishop:
-                    MoveDirections = new List<Vector> { new(1, 1), new(1, -1), new(-1, -1), new(-1, 1) };
+                    MoveDirections = new Vector[] { new(1, 1), new(1, -1), new(-1, -1), new(-1, 1) };
                     break;
                 case PieceValue.Rook:
-                    MoveDirections = new List<Vector> { new(0, 1), new(0, -1), new(1, 0), new(-1, 0) };
+                    MoveDirections = new Vector[] { new(0, 1), new(0, -1), new(1, 0), new(-1, 0) };
                     break;
                 case PieceValue.Queen:
                 case PieceValue.King:
-                    MoveDirections = new List<Vector> { 
+                    MoveDirections = new Vector[] { 
                         new(0, 1), new(0, -1), new(1, 0), new(-1, 0),
                         new(1, 1), new(1, -1), new(-1, -1), new(-1, 1)
                     };
@@ -83,10 +83,9 @@ namespace TopologyChess
 
         public bool HasMoved { get; set; } = false;
 
-        public Point Position { get; set; }
         public Matrix RenderMatrix { get; set; } = Matrix.Identity;
 
-        public List<Vector> MoveDirections { get; set; }
+        public Vector[] MoveDirections { get; set; }
 
         public static readonly Piece Empty = new Piece(PieceType.Empty);
     }

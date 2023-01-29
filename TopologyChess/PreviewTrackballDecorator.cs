@@ -118,7 +118,7 @@ namespace TopologyChess
             // Get the current orientantion from the RotateTransform3D
             Quaternion q = new Quaternion(_rotation.Axis, _rotation.Angle);
 
-            // Compose the delta with the previous orientation
+            // Compose the delta with the Previous orientation
             q *= delta;
 
             // Write the new orientation back to the Rotation3D

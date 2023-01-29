@@ -11,11 +11,16 @@
         Width="1000" Height="600">
     <Window.Resources>
         <MatrixTransform3D x:Key="View3DTransform" Matrix="0 0 -1 0 -1 0 0 0 0 1 0 0 0 0 0 1"/>
-        <Border x:Key="BoardVisual" x:Shared="False">
-            <ItemsControl ItemsSource="{Binding Board}">
+        <Style x:Key="Perspective">
+            <Setter Property="Control.RenderTransformOrigin" Value="0.5,0.5"/>
+            <Setter Property="Control.RenderTransform" Value="{Binding PerspectiveTransform}"/>
+        </Style>
+        <Viewbox Stretch="Uniform" x:Key="BoardVisual" x:Shared="False">
+            <ItemsControl ItemsSource="{Binding Board}" Width="400" Height="400">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <Button Width="50" Height="50" Command="{Binding DataContext.CellCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}" >
+                        <Button Command="{Binding DataContext.CellCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                CommandParameter="{Binding}">
                             <Button.Style>
                                 <Style TargetType="{x:Type Button}">
                                     <Style.Triggers>
@@ -40,57 +45,56 @@
                                             <ControlTemplate>
                                                 <Border Background="{TemplateBinding Background}" >
                                                     <Border BorderThickness="{TemplateBinding BorderThickness}" BorderBrush="{TemplateBinding BorderBrush}">
-                                                        <Viewbox>
-                                                            <Image>
-                                                                <Image.Style>
-                                                                    <Style TargetType="Image">
-                                                                        <Setter Property="RenderTransformOrigin" Value="0.5,0.5"/>
-                                                                        <Setter Property="Visibility" Value="Visible"/>
-                                                                        <Style.Triggers>
-                                                                            <DataTrigger Binding="{Binding Piece.Type}" Value="Empty">
-                                                                                <Setter Property="Visibility" Value="Collapsed"/>
-                                                                            </DataTrigger>
-                                                                            <DataTrigger Binding="{Binding Piece.Type}" Value="WhitePawn">
-                                                                                <Setter Property="Source" Value="{StaticResource wPDrawingImage}" />
-                                                                            </DataTrigger>
-                                                                            <DataTrigger Binding="{Binding Piece.Type}" Value="BlackPawn">
-                                                                                <Setter Property="Source" Value="{StaticResource bPDrawingImage}" />
-                                                                            </DataTrigger>
-                                                                            <DataTrigger Binding="{Binding Piece.Type}" Value="WhiteKnight">
-                                                                                <Setter Property="Source" Value="{StaticResource wNDrawingImage}" />
-                                                                            </DataTrigger>
-                                                                            <DataTrigger Binding="{Binding Piece.Type}" Value="BlackKnight">
-                                                                                <Setter Property="Source" Value="{StaticResource bNDrawingImage}" />
-                                                                            </DataTrigger>
-                                                                            <DataTrigger Binding="{Binding Piece.Type}" Value="WhiteBishop">
-                                                                                <Setter Property="Source" Value="{StaticResource wBDrawingImage}" />
-                                                                            </DataTrigger>
-                                                                            <DataTrigger Binding="{Binding Piece.Type}" Value="BlackBishop">
-                                                                                <Setter Property="Source" Value="{StaticResource bBDrawingImage}" />
-                                                                            </DataTrigger>
-                                                                            <DataTrigger Binding="{Binding Piece.Type}" Value="WhiteRook">
-                                                                                <Setter Property="Source" Value="{StaticResource wRDrawingImage}" />
-                                                                            </DataTrigger>
-                                                                            <DataTrigger Binding="{Binding Piece.Type}" Value="BlackRook">
-                                                                                <Setter Property="Source" Value="{StaticResource bRDrawingImage}" />
-                                                                            </DataTrigger>
-                                                                            <DataTrigger Binding="{Binding Piece.Type}" Value="WhiteQueen">
-                                                                                <Setter Property="Source" Value="{StaticResource wQDrawingImage}" />
-                                                                            </DataTrigger>
-                                                                            <DataTrigger Binding="{Binding Piece.Type}" Value="BlackQueen">
-                                                                                <Setter Property="Source" Value="{StaticResource bQDrawingImage}" />
-                                                                            </DataTrigger>
-                                                                            <DataTrigger Binding="{Binding Piece.Type}" Value="WhiteKing">
-                                                                                <Setter Property="Source" Value="{StaticResource wKDrawingImage}" />
-                                                                            </DataTrigger>
-                                                                            <DataTrigger Binding="{Binding Piece.Type}" Value="BlackKing">
-                                                                                <Setter Property="Source" Value="{StaticResource bKDrawingImage}" />
-                                                                            </DataTrigger>
-                                                                        </Style.Triggers>
-                                                                    </Style>
-                                                                </Image.Style>
-                                                            </Image>
-                                                        </Viewbox>
+                                                        <Image>
+                                                            <Image.Style>
+                                                                <Style TargetType="Image">
+                                                                    <Setter Property="RenderTransformOrigin" Value="0.5,0.5"/>
+                                                                    <Setter Property="RenderTransform" Value="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=DataContext.PerspectiveTransform}"/>
+                                                                    <Setter Property="Visibility" Value="Visible"/>
+                                                                    <Style.Triggers>
+                                                                        <DataTrigger Binding="{Binding Piece.Type}" Value="Empty">
+                                                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                                                        </DataTrigger>
+                                                                        <DataTrigger Binding="{Binding Piece.Type}" Value="WhitePawn">
+                                                                            <Setter Property="Source" Value="{StaticResource wPDrawingImage}" />
+                                                                        </DataTrigger>
+                                                                        <DataTrigger Binding="{Binding Piece.Type}" Value="BlackPawn">
+                                                                            <Setter Property="Source" Value="{StaticResource bPDrawingImage}" />
+                                                                        </DataTrigger>
+                                                                        <DataTrigger Binding="{Binding Piece.Type}" Value="WhiteKnight">
+                                                                            <Setter Property="Source" Value="{StaticResource wNDrawingImage}" />
+                                                                        </DataTrigger>
+                                                                        <DataTrigger Binding="{Binding Piece.Type}" Value="BlackKnight">
+                                                                            <Setter Property="Source" Value="{StaticResource bNDrawingImage}" />
+                                                                        </DataTrigger>
+                                                                        <DataTrigger Binding="{Binding Piece.Type}" Value="WhiteBishop">
+                                                                            <Setter Property="Source" Value="{StaticResource wBDrawingImage}" />
+                                                                        </DataTrigger>
+                                                                        <DataTrigger Binding="{Binding Piece.Type}" Value="BlackBishop">
+                                                                            <Setter Property="Source" Value="{StaticResource bBDrawingImage}" />
+                                                                        </DataTrigger>
+                                                                        <DataTrigger Binding="{Binding Piece.Type}" Value="WhiteRook">
+                                                                            <Setter Property="Source" Value="{StaticResource wRDrawingImage}" />
+                                                                        </DataTrigger>
+                                                                        <DataTrigger Binding="{Binding Piece.Type}" Value="BlackRook">
+                                                                            <Setter Property="Source" Value="{StaticResource bRDrawingImage}" />
+                                                                        </DataTrigger>
+                                                                        <DataTrigger Binding="{Binding Piece.Type}" Value="WhiteQueen">
+                                                                            <Setter Property="Source" Value="{StaticResource wQDrawingImage}" />
+                                                                        </DataTrigger>
+                                                                        <DataTrigger Binding="{Binding Piece.Type}" Value="BlackQueen">
+                                                                            <Setter Property="Source" Value="{StaticResource bQDrawingImage}" />
+                                                                        </DataTrigger>
+                                                                        <DataTrigger Binding="{Binding Piece.Type}" Value="WhiteKing">
+                                                                            <Setter Property="Source" Value="{StaticResource wKDrawingImage}" />
+                                                                        </DataTrigger>
+                                                                        <DataTrigger Binding="{Binding Piece.Type}" Value="BlackKing">
+                                                                            <Setter Property="Source" Value="{StaticResource bKDrawingImage}" />
+                                                                        </DataTrigger>
+                                                                    </Style.Triggers>
+                                                                </Style>
+                                                            </Image.Style>
+                                                        </Image>
                                                     </Border>
                                                 </Border>
                                             </ControlTemplate>
@@ -107,7 +111,7 @@
                     </ItemsPanelTemplate>
                 </ItemsControl.ItemsPanel>
             </ItemsControl>
-        </Border>
+        </Viewbox>
     </Window.Resources>
     
     <Grid>
@@ -146,7 +150,10 @@
                         </ItemsPanelTemplate>
                     </ItemsControl.ItemsPanel>
                 </ItemsControl>
-                <Viewbox Stretch="Uniform" Grid.Column="1" Child="{StaticResource BoardVisual}"/>
+                <Border Grid.Column="1" ClipToBounds="True">
+                    <Border Child="{StaticResource BoardVisual}"
+                         Style="{StaticResource Perspective}"/>
+                </Border>
                 <ItemsControl Grid.Row="1" Grid.Column="1" ItemsSource="{Binding Letters}" Height="21">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
@@ -161,6 +168,7 @@
                 </ItemsControl>
             </Grid>
         </Viewbox>
+        
         <Border Grid.Row="1" Grid.Column="2" MinWidth="500">
             <local:PreviewTrackballDecorator>
                 <tools3D:Interactive3DDecorator>
@@ -175,9 +183,12 @@
                                 </ModelVisual3D.Content>
                             </ModelVisual3D>
                             <tools3D:InteractiveVisual3D Geometry="{Binding Mesh}"
-                                                         Visual="{StaticResource BoardVisual}"
                                                          Transform="{StaticResource View3DTransform}"
-                                                         IsBackVisible="True" />
+                                                         IsBackVisible="True" >
+                                <tools3D:InteractiveVisual3D.Visual>
+                                    <Border ClipToBounds="True" Child="{StaticResource BoardVisual}"/>
+                                </tools3D:InteractiveVisual3D.Visual>
+                            </tools3D:InteractiveVisual3D>
                             <local:ScreenSpaceLines3D Points="{Binding BorderPoints}"
                                                       Color="Black" Thickness="2"
                                                       Transform="{StaticResource View3DTransform}" />

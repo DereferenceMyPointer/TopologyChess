@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Windows;
 
 namespace TopologyChess
 {
@@ -7,18 +8,19 @@ namespace TopologyChess
     {
         private Piece _piece = null;
         private bool _selected;
-        private bool _highlighted;
 
         public Cell(int x, int y)
         {
             X = x;
             Y = y;
+            Position = new Point(x, y);
             Color = (x + y) % 2;
             Piece = Piece.Empty;
         }
 
         public int X { get; }
         public int Y { get; }
+        public Point Position { get; }
         public int Color { get; }
 
         public Piece Piece
@@ -41,15 +43,18 @@ namespace TopologyChess
             }
         }
 
-        public bool Highlighted
+        private Move _move;
+        public Move Move
         {
-            get => _highlighted;
+            get => _move;
             set
             {
-                _highlighted = value;
-                OnPropertyChanged();
+                _move = value;
+                OnPropertyChanged(nameof(Highlighted));
             }
         }
+
+        public bool Highlighted => Move != null;
 
         public event PropertyChangedEventHandler PropertyChanged;
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
