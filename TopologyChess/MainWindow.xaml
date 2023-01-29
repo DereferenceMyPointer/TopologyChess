@@ -13,14 +13,21 @@
         <MatrixTransform3D x:Key="View3DTransform" Matrix="0 0 -1 0 -1 0 0 0 0 1 0 0 0 0 0 1"/>
         <Style x:Key="Perspective">
             <Setter Property="Control.RenderTransformOrigin" Value="0.5,0.5"/>
-            <Setter Property="Control.RenderTransform" Value="{Binding PerspectiveTransform}"/>
+            <Setter Property="Control.RenderTransform">
+                <Setter.Value>
+                    <RotateTransform Angle="{Binding PerspAngle}"/>
+                </Setter.Value>
+            </Setter>
         </Style>
         <Viewbox Stretch="Uniform" x:Key="BoardVisual" x:Shared="False">
             <ItemsControl ItemsSource="{Binding Board}" Width="400" Height="400">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
                         <Button Command="{Binding DataContext.CellCommand, RelativeSource={RelativeSource AncestorType=Window}}"
-                                CommandParameter="{Binding}">
+                                CommandParameter="{Binding}" RenderTransformOrigin="0.5,0.5">
+                            <Button.RenderTransform>
+                                <RotateTransform Angle="{Binding DataContext.PerspAngle, RelativeSource={RelativeSource AncestorType=Window}}"/>
+                            </Button.RenderTransform>
                             <Button.Style>
                                 <Style TargetType="{x:Type Button}">
                                     <Style.Triggers>
@@ -31,10 +38,10 @@
                                             <Setter Property="Background" Value="Bisque"/>
                                         </DataTrigger>
                                         <DataTrigger Binding="{Binding Selected}" Value="True">
-                                            <Setter Property="BorderBrush" Value="Lime"/>
+                                            <Setter Property="BorderBrush" Value="White"/>
                                         </DataTrigger>
                                         <DataTrigger Binding="{Binding Highlighted}" Value="True">
-                                            <Setter Property="BorderBrush" Value="Red"/>
+                                            <Setter Property="BorderBrush" Value="Lime"/>
                                         </DataTrigger>
                                     </Style.Triggers>
                                     <Setter Property="OverridesDefaultStyle" Value="True"/>
@@ -47,11 +54,13 @@
                                                     <Grid>
                                                         <Border Opacity="0.2" BorderThickness="{TemplateBinding BorderThickness}"
                                                                 BorderBrush="{x:Null}" Background="{TemplateBinding BorderBrush}"/>
-                                                        <Image>
+                                                        <Image RenderTransformOrigin="0.5, 0.5" DataContext="{Binding}">
                                                             <Image.Style>
                                                                 <Style TargetType="Image">
                                                                     <Setter Property="RenderTransformOrigin" Value="0.5,0.5"/>
-                                                                    <Setter Property="RenderTransform" Value="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=DataContext.PerspectiveTransform}"/>
+                                                                    <!--Setter Property="RenderTransform" Value="{Binding RelativeSource={RelativeSource AncestorType=Window}, 
+                                                                        Path=DataContext.PerspectiveTransform}"/-->
+                                                                    <Setter Property="RenderTransform" Value="{Binding Piece.RenderTransform}"/>
                                                                     <Setter Property="Visibility" Value="Visible"/>
                                                                     <Style.Triggers>
                                                                         <DataTrigger Binding="{Binding Piece.Type}" Value="Empty">
@@ -153,8 +162,11 @@
                     </ItemsControl.ItemsPanel>
                 </ItemsControl>
                 <Border Grid.Column="1" ClipToBounds="True">
-                    <Border Child="{StaticResource BoardVisual}"
-                         Style="{StaticResource Perspective}"/>
+                    <Border Child="{StaticResource BoardVisual}" RenderTransformOrigin="0.5,0.5">
+                        <Border.RenderTransform>
+                            <RotateTransform Angle="{Binding PerspAngle}"/>
+                        </Border.RenderTransform>
+                    </Border>
                 </Border>
                 <ItemsControl Grid.Row="1" Grid.Column="1" ItemsSource="{Binding Letters}" Height="21">
                     <ItemsControl.ItemTemplate>

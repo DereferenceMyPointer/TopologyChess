@@ -36,25 +36,7 @@ namespace TopologyChess
                     this[i, j] = new Cell(i, j);
         }
 
-        public HashSet<Move> TestMoves(Cell cell)
-        {
-            HashSet<Move> moves = new HashSet<Move>();
-            if (cell.Piece.Type == PieceType.Empty) return moves;
-            foreach (var d in cell.Piece.MoveDirections)
-            {
-                int x = cell.X + (int)d.X;
-                int y = cell.Y + (int)d.Y;
-                if (!OutOfBounds(new Point(x, y)))
-                {
-                    moves.Add(new Move { From = cell, To = this[x, y] });
-                }
-            }
-            return moves;
-        }
-
         private Move LastMove { get; set; }
-
-        public bool OutOfBounds(Point p) => !(0 <= p.X && p.X < Size && 0 <= p.Y && p.Y < Size);
 
         public void MarkMoves(Cell from)
         {
@@ -142,15 +124,15 @@ namespace TopologyChess
         public void Play(Move move)
         {
             Piece piece = move.MovingPiece;
+            piece.HasMoved = true;
+            piece.RenderTransform.Matrix *= move.Path.Value.M;
+            if (piece.Value == PieceValue.Pawn)
+            {
+                move.Path.Value.M.Transform(piece.MoveDirections);
+            }
             move.Capture.Piece = Piece.Empty;
             move.To.Piece = piece;
             move.From.Piece = Piece.Empty;
-            piece.HasMoved = true;
-            piece.RenderMatrix.Append(move.Path.Value.M);
-            if (piece.Value == PieceValue.Pawn)
-            {
-                piece.RenderMatrix.Transform(piece.MoveDirections);
-            }
             LastMove = move;
         }
 

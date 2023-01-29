@@ -33,5 +33,12 @@ namespace TopologyChess
         public IEnumerator<T> GetEnumerator() => ToLinkedList().GetEnumerator();
 
         IEnumerator IEnumerable.GetEnumerator() => ToLinkedList().GetEnumerator();
+
+        public override string ToString()
+        {
+            string str = "";
+            foreach (var step in this) str += step.ToString();
+            return str;
+        }
     }
 }

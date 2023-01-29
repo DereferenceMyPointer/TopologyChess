@@ -24,5 +24,10 @@ namespace TopologyChess
         public override bool Equals(object obj) => obj is Step step && Equals(step);
 
         public override int GetHashCode() => base.GetHashCode();
+
+        public override string ToString()
+        {
+            return "P = " + P.ToString() + "\nV = " + V.ToString() + "\nM = " + M.ToString() + "\n\n";
+        }
     }
 }

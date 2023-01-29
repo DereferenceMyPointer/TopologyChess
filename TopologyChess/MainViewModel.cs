@@ -15,7 +15,7 @@ namespace TopologyChess
     {
         public MainViewModel()
         {
-            TopologyModel.Transform(Mesh, (Point p) => Equations.Cylinder(p.X, p.Y));
+            TopologyModel.Transform(Mesh, (Point p) => Equations.Moebius(p.X, p.Y));
             BorderPoints = TopologyModel.GetBorder(Mesh);
         }
         
@@ -61,13 +61,13 @@ namespace TopologyChess
         }
 
         private double angle = 0;
-        private RotateTransform _persp = new RotateTransform();
-        public RotateTransform PerspectiveTransform
+        //private RotateTransform _persp = new RotateTransform();
+        public double PerspAngle
         {
-            get => _persp;
+            get => angle;
             set
             {
-                _persp = value;
+                angle = value;
                 OnPropertyChanged();
             }
         }
@@ -75,21 +75,21 @@ namespace TopologyChess
         public ICommand NewGameCommand => _newGameCommand ??= new RelayCommand(parameter => 
         {
             SetupBoard();
-            Board.CurrentTopology = Topology.Topologies.FirstOrDefault(t => t.Name == "Cylinder Horizontal");
-            var top = Board.CurrentTopology;
+            Board.CurrentTopology = Topology.Topologies.FirstOrDefault(t => t.Name == "Moebius Horizontal");
+            /*var top = Board.CurrentTopology;
             string str = "";
             for (int i = 0; i < 4; i++)
             {
                 str += i.ToString() + ":\n" + top.Connections[i].ToString() + " " + top.WarpMatrices[i] + "\n\n";
             }
-            MessageBox.Show(str);
+            MessageBox.Show(str);*/
         });
 
         public ICommand ClearCommand => _clearCommand ??= new RelayCommand(parameter =>
         {
             //Board = new Board(8);
-            angle = (angle + 45) % 360;
-            PerspectiveTransform = new RotateTransform(angle);
+            PerspAngle = (PerspAngle + 45) % 360;
+            //PerspectiveTransform = new RotateTransform(angle);
         });
 
         private Cell selectedCell;

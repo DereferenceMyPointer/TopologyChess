@@ -116,14 +116,14 @@ namespace TopologyChess
             {
                 int side2 = Connections[side];
                 if (side2 == -1) continue;
-                Step next = step;
+                Step next;
                 Matrix F = Matrix.Identity; F.Translate(0.5, 0.5); F.Scale(1.0 / size, 1.0 / size);
                 Matrix B = Matrix.Identity; B.Scale(size, size); B.Translate(-0.5, -0.5);
                 Matrix A = WarpMatrices[side];
                 next.P = B.Transform(A.Transform(F.Transform(step.P)));
                 A.OffsetX = 0; A.OffsetY = 0;
                 next.V = A.Transform(step.V);
-                next.M.Append(A);
+                next.M = step.M * A;
                 warps = warps.Union(Warp(next, size)).ToList();
             }
             return warps;

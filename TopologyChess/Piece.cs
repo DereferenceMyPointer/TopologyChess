@@ -83,7 +83,7 @@ namespace TopologyChess
 
         public bool HasMoved { get; set; } = false;
 
-        public Matrix RenderMatrix { get; set; } = Matrix.Identity;
+        public MatrixTransform RenderTransform { get; set; } = new MatrixTransform();
 
         public Vector[] MoveDirections { get; set; }
 
