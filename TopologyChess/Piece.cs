@@ -50,23 +50,23 @@ namespace TopologyChess
             {
                 case PieceValue.Pawn:
                     int d = -(int)Color;
-                    MoveDirections = new Vector[] { new(-1, d), new(0, d), new(1, d) };
+                    MoveDirections = new IntVector[] { new(0, d), new(-1, d), new(1, d) };
                     break;
                 case PieceValue.Knight:
-                    MoveDirections = new Vector[] {
+                    MoveDirections = new IntVector[] {
                         new(1, 2), new(1, -2), new(-1, -2), new(-1, 2),
                         new(2, 1), new(2, -1), new(-2, -1), new(-2, 1)
                     };
                     break;
                 case PieceValue.Bishop:
-                    MoveDirections = new Vector[] { new(1, 1), new(1, -1), new(-1, -1), new(-1, 1) };
+                    MoveDirections = new IntVector[] { new(1, 1), new(1, -1), new(-1, -1), new(-1, 1) };
                     break;
                 case PieceValue.Rook:
-                    MoveDirections = new Vector[] { new(0, 1), new(0, -1), new(1, 0), new(-1, 0) };
+                    MoveDirections = new IntVector[] { new(0, 1), new(0, -1), new(1, 0), new(-1, 0) };
                     break;
                 case PieceValue.Queen:
                 case PieceValue.King:
-                    MoveDirections = new Vector[] { 
+                    MoveDirections = new IntVector[] { 
                         new(0, 1), new(0, -1), new(1, 0), new(-1, 0),
                         new(1, 1), new(1, -1), new(-1, -1), new(-1, 1)
                     };
@@ -81,12 +81,61 @@ namespace TopologyChess
 
         public PieceType Type { get; }
 
+        public bool Slides => Value == PieceValue.Bishop || Value == PieceValue.Rook || Value == PieceValue.Queen;
+
         public bool HasMoved { get; set; } = false;
 
         public MatrixTransform RenderTransform { get; set; } = new MatrixTransform();
 
-        public Vector[] MoveDirections { get; set; }
+        public IntVector[] MoveDirections { get; set; }
+        public IntVector[] AttackDirections => MoveDirections.Skip(Value == PieceValue.Pawn ? 1 : 0).ToArray();
+        public IntVector Position { get; set; }
 
         public static readonly Piece Empty = new Piece(PieceType.Empty);
     }
 }
+
+
+/*static Piece()
+        {
+            var myResourceDictionary = new ResourceDictionary();
+            myResourceDictionary.Source =
+                new Uri("/DllName;component/Resources/PiecesDictionary.xaml",
+                        UriKind.RelativeOrAbsolute);
+        }*/
+
+/*public static readonly Dictionary<PieceValue, IntVector[]> Directions = new()
+{
+    { PieceValue.None, Array.Empty<IntVector>() },
+    { PieceValue.Pawn, Array.Empty<IntVector>() },
+    { PieceValue.Knight, new IntVector[] {
+        new(1, 2), new(1, -2), new(-1, -2), new(-1, 2),
+        new(2, 1), new(2, -1), new(-2, -1), new(-2, 1)
+    } },
+    { PieceValue.Bishop, new IntVector[] {
+        new(1, 1), new(1, -1), new(-1, -1), new(-1, 1)
+    } },
+    { PieceValue.Rook, new IntVector[] {
+        new(0, 1), new(0, -1), new(1, 0), new(-1, 0)
+    } },
+    { PieceValue.Queen, new IntVector[] {
+        new(0, 1), new(0, -1), new(1, 0), new(-1, 0),
+        new(1, 1), new(1, -1), new(-1, -1), new(-1, 1)
+    } },
+    { PieceValue.King, new IntVector[] {
+        new(0, 1), new(0, -1), new(1, 0), new(-1, 0),
+        new(1, 1), new(1, -1), new(-1, -1), new(-1, 1)
+    } },
+};
+
+public static readonly IntVector[][] AllDirections = new IntVector[][]
+{
+    new IntVector[] { // Once
+        new(1, 2), new(1, -2), new(-1, -2), new(-1, 2),
+        new(2, 1), new(2, -1), new(-2, -1), new(-2, 1)
+    },
+    new IntVector[] { // Slide
+        new(0, 1), new(0, -1), new(1, 0), new(-1, 0),
+        new(1, 1), new(1, -1), new(-1, -1), new(-1, 1)
+    }
+};*/

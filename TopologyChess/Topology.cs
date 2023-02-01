@@ -88,18 +88,18 @@ namespace TopologyChess
 
                 A.M11 = Math.Round(A.M11); A.M12 = Math.Round(A.M12);
                 A.M21 = Math.Round(A.M21); A.M22 = Math.Round(A.M22);
-                A.OffsetX = Math.Round(A.OffsetX); A.OffsetY = Math.Round(A.OffsetY);
+                A.OffsetX = Math.Round(A.OffsetX, 1); A.OffsetY = Math.Round(A.OffsetY, 1);
                 WarpMatrices[s1] = A;
             }
         }
 
-        public static List<int> Sides(Point p, int size)
+        public static List<int> Sides(IntVector p, int size)
         {
             List<int> result = new List<int>();
-            if (p.X < -0.5) result.Add(3);
-            else if (p.X >= size - 0.5) result.Add(1);
-            if (p.Y < -0.5) result.Add(0);
-            else if (p.Y >= size - 0.5) result.Add(2);
+            if (p.X < 0) result.Add(3);
+            else if (p.X >= size) result.Add(1);
+            if (p.Y < 0) result.Add(0);
+            else if (p.Y >= size) result.Add(2);
             return result;
         }
 
@@ -116,13 +116,13 @@ namespace TopologyChess
             {
                 int side2 = Connections[side];
                 if (side2 == -1) continue;
-                Step next;
+                Step next = new Step();
                 Matrix F = Matrix.Identity; F.Translate(0.5, 0.5); F.Scale(1.0 / size, 1.0 / size);
                 Matrix B = Matrix.Identity; B.Scale(size, size); B.Translate(-0.5, -0.5);
                 Matrix A = WarpMatrices[side];
-                next.P = B.Transform(A.Transform(F.Transform(step.P)));
+                next.P = (IntVector)B.Transform(A.Transform(F.Transform((Point)step.P)));
                 A.OffsetX = 0; A.OffsetY = 0;
-                next.V = A.Transform(step.V);
+                next.V = (IntVector)A.Transform((Vector)step.V);
                 next.M = step.M * A;
                 warps = warps.Union(Warp(next, size)).ToList();
             }

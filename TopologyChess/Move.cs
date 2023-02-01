@@ -6,21 +6,30 @@ namespace TopologyChess
 {
     public class Move
     {
-        public Cell From { get; set; }
-        public Cell To { get; set; }
+        public IntVector From { get; set; }
+        public IntVector To { get; set; }
         public Piece MovingPiece { get; set; }
         public Chain<Step> Path { get; set; }
-        public Cell Capture { get; set; }
+        public IntVector Capture { get; set; }
 
         public Move() { }
         public Move(Cell from, Cell to, Chain<Step> path)
         {
-            From = from;
-            To = to;
+            From = from.Position;
+            To = to.Position;
             Path = path;
             MovingPiece = from.Piece;
-            Capture = to;
+            Capture = to.Position;
         }
+
+        public static readonly Move NoMove = new()
+        {
+            From = new(-1, -1),
+            To = new(-1, -1),
+            Capture = new(-1, -1),
+            MovingPiece = null,
+            Path = null
+        };
     }
 
     public class Castle : Move

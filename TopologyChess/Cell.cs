@@ -11,16 +11,12 @@ namespace TopologyChess
 
         public Cell(int x, int y)
         {
-            X = x;
-            Y = y;
-            Position = new Point(x, y);
+            Position = new IntVector(x, y);
             Color = (x + y) % 2;
             Piece = Piece.Empty;
         }
 
-        public int X { get; }
-        public int Y { get; }
-        public Point Position { get; }
+        public IntVector Position { get; }
         public int Color { get; }
 
         public Piece Piece
@@ -28,6 +24,7 @@ namespace TopologyChess
             get => _piece;
             set
             {
+                if (value.Type != PieceType.Empty) value.Position = Position;
                 _piece = value;
                 OnPropertyChanged();
             }

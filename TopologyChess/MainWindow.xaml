@@ -20,7 +20,7 @@
             </Setter>
         </Style>
         <Viewbox Stretch="Uniform" x:Key="BoardVisual" x:Shared="False">
-            <ItemsControl ItemsSource="{Binding Board}" Width="400" Height="400">
+            <ItemsControl ItemsSource="{Binding Chess.Board, NotifyOnSourceUpdated=True}" Width="500" Height="500">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
                         <Button Command="{Binding DataContext.CellCommand, RelativeSource={RelativeSource AncestorType=Window}}"
@@ -54,12 +54,10 @@
                                                     <Grid>
                                                         <Border Opacity="0.2" BorderThickness="{TemplateBinding BorderThickness}"
                                                                 BorderBrush="{x:Null}" Background="{TemplateBinding BorderBrush}"/>
-                                                        <Image RenderTransformOrigin="0.5, 0.5" DataContext="{Binding}">
+                                                        <Image>
                                                             <Image.Style>
                                                                 <Style TargetType="Image">
                                                                     <Setter Property="RenderTransformOrigin" Value="0.5,0.5"/>
-                                                                    <!--Setter Property="RenderTransform" Value="{Binding RelativeSource={RelativeSource AncestorType=Window}, 
-                                                                        Path=DataContext.PerspectiveTransform}"/-->
                                                                     <Setter Property="RenderTransform" Value="{Binding Piece.RenderTransform}"/>
                                                                     <Setter Property="Visibility" Value="Visible"/>
                                                                     <Style.Triggers>
@@ -138,6 +136,10 @@
         <StackPanel Orientation="Horizontal" Grid.ColumnSpan="2" Margin="15,0">
             <Button Content="New Game" Margin="5" Padding="10,5" Command="{Binding NewGameCommand}"/>
             <Button Content="Clear" Margin="5" Padding="10,5" Command="{Binding ClearCommand}"/>
+            <ComboBox Margin="10,5" MinWidth="200"
+                      ItemsSource="{Binding Topologies, NotifyOnSourceUpdated=True}"
+                      SelectedItem="{Binding Chess.CurrentTopology, NotifyOnTargetUpdated=True}"
+                      DisplayMemberPath="Name"/>
         </StackPanel>
         <Viewbox Grid.Row="1" Stretch="Uniform" HorizontalAlignment="Left">
             <Grid>
@@ -203,9 +205,9 @@
                                     <Border ClipToBounds="True" Child="{StaticResource BoardVisual}"/>
                                 </tools3D:InteractiveVisual3D.Visual>
                             </tools3D:InteractiveVisual3D>
-                            <local:ScreenSpaceLines3D Points="{Binding BorderPoints}"
+                            <!--local:ScreenSpaceLines3D Points="{Binding BorderPoints}"
                                                       Color="Black" Thickness="2"
-                                                      Transform="{StaticResource View3DTransform}" />
+                                                      Transform="{StaticResource View3DTransform}" /-->
 
                         </Viewport3D.Children>
                     </Viewport3D>

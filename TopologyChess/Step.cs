@@ -6,11 +6,12 @@ namespace TopologyChess
 {
     public struct Step : IEquatable<Step>
     {
-        public Point P { get; set; }
-        public Vector V { get; set; }
+        public IntVector P { get; set; }
+        public IntVector V { get; set; }
         public Matrix M { get; set; }
 
-        public Step(Point p, Vector v, Matrix m)
+        public Step() { }
+        public Step(IntVector p, IntVector v, Matrix m)
         {
             P = p; V = v; M = m;
         }
