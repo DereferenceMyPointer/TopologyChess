@@ -229,9 +229,51 @@ namespace TopologyChess
             }
             if (piece == king)
             {
-                if (!king.HasMoved && !IsAttacked(king.Position))
+                if (!king.HasMoved && !IsAttacked(king.Position) &&
+                    Players[CurrentParty].Pieces.Any(p => p.Value == PieceValue.Rook && !p.HasMoved)
+                )
                 {
-                    //Players[CurrentParty].Pieces.Any(p => p.Value == PieceValue.Rook)
+                    IntVector[] directions = new IntVector[4] { new(0, 1), new(0, -1), new(1, 0), new(-1, 0) };
+                    foreach (var dir in directions)
+                    {
+                        int distance = 1;
+                        List<Chain<Step>> leads = new List<Chain<Step>>();
+                        List<Chain<Step>> new_leads = new List<Chain<Step>>();
+                        Piece rook = null;
+                        stepleads.Add(new Step(king.Position, dir, Matrix.Identity));
+                        do
+                        {
+                            foreach (var lead in leads)
+                            {
+                                Step next = lead.Value;
+                                next.P += next.V;
+                                foreach (Step warp in CurrentTopology.Warp(next, Board.Size))
+                                {
+                                    new_leads.Add(lead.Add(warp));
+                                }
+                            }
+                            leads.Clear();
+                            foreach (var lead in new_leads)
+                            {
+                                Piece piece = Board[lead.Value.P].Piece;
+                                if (piece.Color == (Party)(-(int)king.Color)) continue;
+                                if (piece.Color == king.Color && (piece.HasMoved ||
+                                    piece.Value != PieceValue.Rook ||
+                                    piece.Value != PieceValue.King ||
+                                    (piece.Value == PieceValue.King && lead.Value.V == dir))) continue;
+                                if (distance <= 2 && IsAttacked(lead.Value.P)) continue;
+                                if (piece.Value == PieceValue.Rook) rook = piece;
+                                if (distance == 1) {
+                                    leads.Add(lead);
+                                    continue;
+                                }
+                                if (rook != null) {
+                                    //
+                                }
+                            }
+                            new_leads.Clear();
+                        } while (stepleads.Any() && distance++ < Board.Size * Board.Size);
+                    }
                 }
             }
             return moves;
