@@ -7,6 +7,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Runtime.ConstrainedExecution;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
@@ -230,8 +231,7 @@ namespace TopologyChess
             if (piece == king)
             {
                 if (!king.HasMoved && !IsAttacked(king.Position) &&
-                    Players[CurrentParty].Pieces.Any(p => p.Value == PieceValue.Rook && !p.HasMoved)
-                )
+                    Players[CurrentParty].Pieces.Any(p => p.Value == PieceValue.Rook && !p.HasMoved))
                 {
                     IntVector[] directions = new IntVector[4] { new(0, 1), new(0, -1), new(1, 0), new(-1, 0) };
                     foreach (var dir in directions)
@@ -240,7 +240,7 @@ namespace TopologyChess
                         List<Chain<Step>> leads = new List<Chain<Step>>();
                         List<Chain<Step>> new_leads = new List<Chain<Step>>();
                         Piece rook = null;
-                        stepleads.Add(new Step(king.Position, dir, Matrix.Identity));
+                        leads.Add(new Chain<Step>(new Step(king.Position, dir, Matrix.Identity)));
                         do
                         {
                             foreach (var lead in leads)
@@ -255,24 +255,54 @@ namespace TopologyChess
                             leads.Clear();
                             foreach (var lead in new_leads)
                             {
-                                Piece piece = Board[lead.Value.P].Piece;
-                                if (piece.Color == (Party)(-(int)king.Color)) continue;
-                                if (piece.Color == king.Color && (piece.HasMoved ||
-                                    piece.Value != PieceValue.Rook ||
-                                    piece.Value != PieceValue.King ||
-                                    (piece.Value == PieceValue.King && lead.Value.V == dir))) continue;
+                                Piece piece1 = Board[lead.Value.P].Piece;
+                                if (piece1.Color == (Party)(-(int)king.Color)) continue;
+                                if (piece1.Color == king.Color && (piece1.HasMoved ||
+                                    piece1.Value != PieceValue.Rook)) continue;
                                 if (distance <= 2 && IsAttacked(lead.Value.P)) continue;
-                                if (piece.Value == PieceValue.Rook) rook = piece;
-                                if (distance == 1) {
-                                    leads.Add(lead);
-                                    continue;
+                                if (piece1.Value == PieceValue.Rook) rook = piece1;
+                                if (rook != null && distance > 1)
+                                {
+                                    Chain<Step> old = lead;
+                                    Chain<Step> rpath = null;
+                                    while (old.Value.P != rook.Position) old = old.Previous;
+                                    Matrix inv = old.Value.M;
+                                    inv.Invert();
+                                    while (old.Previous != null)
+                                    {
+                                        rpath = new Chain<Step>
+                                        {
+                                            Value = new Step(old.Value.P, -old.Value.V, old.Value.M * inv),
+                                            Previous = rpath
+                                        };
+                                        old = old.Previous;
+                                    }
+                                    Chain<Step> kpath = lead;
+                                    while (kpath.Previous.Previous.Previous != null) kpath = kpath.Previous;
+                                    Move rookMove = new Move()
+                                    {
+                                        From = rook.Position,
+                                        To = rpath.Value.P,
+                                        Capture = rpath.Value.P,
+                                        MovingPiece = rook,
+                                        Path = rpath
+                                    };
+                                    if (IsAttacked(kpath.Value.P, rookMove)) continue;
+                                    Castle castle = new Castle()
+                                    {
+                                        From = king.Position,
+                                        To = kpath.Value.P,
+                                        Capture = kpath.Value.P,
+                                        MovingPiece = king,
+                                        Path = kpath,
+                                        RookMove = rookMove
+                                    };
+                                    moves.Add(castle);
                                 }
-                                if (rook != null) {
-                                    //
-                                }
+                                else leads.Add(lead);
                             }
                             new_leads.Clear();
-                        } while (stepleads.Any() && distance++ < Board.Size * Board.Size);
+                        } while (leads.Any() && distance++ < Board.Size * Board.Size);
                     }
                 }
             }
@@ -292,7 +322,7 @@ namespace TopologyChess
             return moves;
         }
 
-        public void Play(Move move)
+        private void Execute(Move move)
         {
             Piece piece = move.MovingPiece;
             piece.HasMoved = true;
@@ -305,10 +335,19 @@ namespace TopologyChess
                 }
             }
             Piece captured = Board[move.Capture].Piece;
-            Players[CurrentParty].Remove(captured);
+            Players[(Party)(-(int)piece.Color)].Remove(captured);
             Board[move.Capture].Piece = Piece.Empty;
             Board[move.To].Piece = piece;
             Board[move.From].Piece = Piece.Empty;
+        }
+
+        public void Play(Move move)
+        {
+            if (move is Castle castle)
+            {
+                Execute(castle.RookMove);
+            }
+            Execute(move);
             LastMove = move;
             History.Add(move);
             CurrentParty = (Party)(-(int)CurrentParty);

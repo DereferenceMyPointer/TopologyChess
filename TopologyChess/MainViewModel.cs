@@ -16,9 +16,14 @@ namespace TopologyChess
         public MainViewModel()
         {
             Chess.Board = new Board(8);
-            TopologyModel.Transform(Mesh, (Point p) => Equations.Moebius(p.X, p.Y));
+            TopologyModel.Transform(Mesh, (Point p) => Equations.Globe(p.X, p.Y));
             BorderPoints = TopologyModel.GetBorder(Mesh);
             Topologies = new ObservableCollection<Topology>(Topology.Topologies);
+
+            /*Step s1 = new Step(new(0, 0), new(0, 0), new Matrix(1, 0, 0, -2, 0, 0));
+            Matrix m2 = s1.M;
+            m2.Invert();
+            MessageBox.Show(m2.ToString());*/
         }
 
         private Game _chess = new Game();
