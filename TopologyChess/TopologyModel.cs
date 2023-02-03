@@ -47,22 +47,28 @@ namespace TopologyChess
         {
             Point3DCollection points = new Point3DCollection();
             int n = (int)Math.Sqrt(mesh.Positions.Count);
-            for (int j = 0; j < n - 1; j++)
+            points.Add(mesh.Positions[0]);
+            for (int j = 1; j < n - 1; j++)
             {
+                points.Add(mesh.Positions[j]);
                 points.Add(mesh.Positions[j]);
             }
             for (int i = n - 1; i < (n * n) - 1; i += n)
             {
                 points.Add(mesh.Positions[i]);
+                points.Add(mesh.Positions[i]);
             }
             for (int j = (n * n) - 1; j > n * (n - 1); j--)
             {
                 points.Add(mesh.Positions[j]);
+                points.Add(mesh.Positions[j]);
             }
-            for (int i = n * (n - 1); i >= 0; i -= n)
+            for (int i = n * (n - 1); i > 0; i -= n)
             {
                 points.Add(mesh.Positions[i]);
+                points.Add(mesh.Positions[i]);
             }
+            points.Add(mesh.Positions[0]);
             return points;
         }
 

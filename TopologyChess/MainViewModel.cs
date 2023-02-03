@@ -16,7 +16,7 @@ namespace TopologyChess
         public MainViewModel()
         {
             Chess.Board = new Board(8);
-            TopologyModel.Transform(Mesh, (Point p) => Equations.Globe(p.X, p.Y));
+            TopologyModel.Transform(Mesh, (Point p) => Equations.Klein(p.X, p.Y));
             BorderPoints = TopologyModel.GetBorder(Mesh);
             Topologies = new ObservableCollection<Topology>(Topology.Topologies);
 

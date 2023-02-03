@@ -88,5 +88,51 @@ namespace TopologyChess
             Sin(Tau * u) * Sqrt(v * (1 - v)),
             1 - 2 * v
         );
+
+        private static Func<double, double, Point3D> Tube(
+            Func<double, Point> alpha,
+            Func<double, Vector> nu,
+            Func<double, double> rho)
+        {
+            return (u, v) =>
+            {
+                double phi = Tau * u;
+                double theta = Tau * v;
+                Point a = alpha(phi);
+                Vector n = nu(phi);
+                double r = rho(u);
+                return new Point3D(
+                    r * Sin(theta),
+                    a.Y + r * n.Y * Cos(theta),
+                    a.X + r * n.X * Cos(theta)
+                );
+            };
+        }
+
+        static double a = 1, b = 0.5;
+        static double c = 0.3, d = 0.5;
+        private static Func<double, double, Point3D> KleinDeleg = Tube(
+            alpha: (phi) => new Point(
+                -a * Cos(phi),
+                b * Sin(phi) * (1 - Cos(phi))
+            ),
+            nu: (phi) =>
+            {
+                if (phi == 0) return new Vector(0, 1);
+                if (phi == Tau) return new Vector(0, -1);
+                Vector n = new(
+                    b * (Cos(2 * phi) - Cos(phi)),
+                    a * Sin(phi)
+                );
+                n.Normalize();
+                return n;
+            },
+            rho: (t) => c - d * (2 * t - 1) * Sqrt(t * (1 - t))
+        );
+
+        public static Point3D Klein(double u, double v)
+        {
+            return KleinDeleg(u, v);
+        }
     }
 }

@@ -205,9 +205,9 @@
                                     <Border ClipToBounds="True" Child="{StaticResource BoardVisual}"/>
                                 </tools3D:InteractiveVisual3D.Visual>
                             </tools3D:InteractiveVisual3D>
-                            <!--local:ScreenSpaceLines3D Points="{Binding BorderPoints}"
+                            <local:ScreenSpaceLines3D Points="{Binding BorderPoints}"
                                                       Color="Black" Thickness="2"
-                                                      Transform="{StaticResource View3DTransform}" /-->
+                                                      Transform="{StaticResource View3DTransform}" />
 
                         </Viewport3D.Children>
                     </Viewport3D>
