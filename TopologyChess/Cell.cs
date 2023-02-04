@@ -48,10 +48,12 @@ namespace TopologyChess
             {
                 _move = value;
                 OnPropertyChanged(nameof(Highlighted));
+                OnPropertyChanged(nameof(MoveAngle));
             }
         }
 
         public bool Highlighted => Move != null;
+        public double MoveAngle => Move?.Path.Value.V.Angle ?? 0;
 
         public event PropertyChangedEventHandler PropertyChanged;
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)

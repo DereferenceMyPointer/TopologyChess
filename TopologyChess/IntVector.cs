@@ -19,6 +19,8 @@ namespace TopologyChess
             X = x; Y = y;
         }
 
+        public double Angle => Math.Atan2(Y, X) / Math.PI * 180;
+
         public override bool Equals(object obj)
         {
             return obj is IntVector vec && vec.X == X && vec.Y == Y;
