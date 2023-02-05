@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Media;
 using System.Windows.Media.Media3D;
 
@@ -11,29 +13,46 @@ namespace TopologyChess
 {
     public class Topology
     {
-        public static List<Topology> Topologies = new List<Topology>()
+        public static List<Topology> Topologies;
+
+        private static readonly List<Color> Colors;
+
+        static Topology()
         {
-            new Topology("Flat"),
-            new Topology("Cylinder Horizontal", (1, 3, 1)),
-            new Topology("Cylinder Vertical", (0, 2, 1)),
-            new Topology("Moebius Horizontal", (1, 3, 0)),
-            new Topology("Moebius Vertical", (0, 2, 0)),
-            new Topology("Torus", (1, 3, 1), (0, 2, 1)),
-            new Topology("Projective Plane", (1, 3, 0), (0, 2, 0)),
-            new Topology("Klein Vertical", (1, 3, 1), (0, 2, 0)),
-            new Topology("Klein Horizontal", (1, 3, 0), (0, 2, 1)),
-            new Topology("Globe Vertical", (1, 3, 1), (0, 0, 2), (2, 2, 2)),
-            new Topology("Globe Horizontal", (0, 2, 1), (1, 1, 2), (3, 3, 2)),
-            new Topology("Pillow Vertical", (1, 3, 1), (0, 0, 1), (2, 2, 1)),
-            new Topology("Pillow Horizontal", (0, 2, 1), (1, 1, 1), (3, 3, 1)),
-            new Topology("Sphere Right", (0, 3, 1), (1, 2, 1)),
-            new Topology("Sphere Left", (0, 1, 1), (2, 3, 1)),
-            new Topology("Klein Right", (0, 3, 0), (1, 2, 0)),
-            new Topology("Klein Left", (0, 1, 0), (2, 3, 0)),
-            new Topology("Mirror Vertical", (0, 0, 0), (2, 2, 0)),
-            new Topology("Mirror Horizontal", (1, 1, 0), (3, 3, 0)),
-            new Topology("Mirror Hall", (0, 0, 0), (1, 1, 0), (2, 2, 0), (3, 3, 0))
-        };
+            Colors = new List<Color>()
+            {
+                Color.FromRgb(0, 0, 255),
+                Color.FromRgb(255, 0, 0),
+                Color.FromRgb(0, 255, 0),
+                Color.FromRgb(255, 255, 0),
+                Color.FromRgb(255, 0, 255),
+                Color.FromRgb(0, 255, 255),
+                Color.FromRgb(255, 255, 255),
+                Color.FromRgb(0, 0, 0)
+            };
+            Topologies = new List<Topology>() {
+                new Topology("Flat"),
+                new Topology("Cylinder Horizontal", (1, 3, 1)),
+                new Topology("Cylinder Vertical", (0, 2, 1)),
+                new Topology("Moebius Horizontal", (1, 3, 0)),
+                new Topology("Moebius Vertical", (0, 2, 0)),
+                new Topology("Torus", (1, 3, 1), (0, 2, 1)),
+                new Topology("Projective Plane", (1, 3, 0), (0, 2, 0)),
+                new Topology("Klein Vertical", (1, 3, 1), (0, 2, 0)),
+                new Topology("Klein Horizontal", (1, 3, 0), (0, 2, 1)),
+                new Topology("Globe Vertical", (1, 3, 1), (0, 0, 2), (2, 2, 2)),
+                new Topology("Globe Horizontal", (0, 2, 1), (1, 1, 2), (3, 3, 2)),
+                new Topology("Pillow Vertical", (1, 3, 1), (0, 0, 1), (2, 2, 1)),
+                new Topology("Pillow Horizontal", (0, 2, 1), (1, 1, 1), (3, 3, 1)),
+                new Topology("Sphere Right", (0, 3, 1), (1, 2, 1)),
+                new Topology("Sphere Left", (0, 1, 1), (2, 3, 1)),
+                new Topology("Klein Right", (0, 3, 0), (1, 2, 0)),
+                new Topology("Klein Left", (0, 1, 0), (2, 3, 0)),
+                new Topology("Mirror Vertical", (0, 0, 0), (2, 2, 0)),
+                new Topology("Mirror Horizontal", (1, 1, 0), (3, 3, 0)),
+                new Topology("Mirror Hall", (0, 0, 0), (1, 1, 0), (2, 2, 0), (3, 3, 0))
+            };
+        }
         
         public Topology(string name, params (int side1, int side2, int type)[] connection_list)
         {
@@ -50,6 +69,7 @@ namespace TopologyChess
                 Types[side2] = type;
             }
             CreateMatrices();
+            SetUIs();
         }
 
         public string Name { get; }
@@ -127,6 +147,65 @@ namespace TopologyChess
                 warps = warps.Union(Warp(next, size)).ToList();
             }
             return warps;
+        }
+
+        public UniformGrid[] UIs { get; } = new UniformGrid[4];
+
+        public void SetUIs()
+        {
+            for (int i = 0; i < 4; i++)
+            {
+                UIs[i] = new UniformGrid()
+                {
+                    Rows = 1, Columns = 1,
+                    LayoutTransform = new RotateTransform(i * 90)
+                };
+            }
+            int pair = 0;
+            foreach (var (s1, s2, type) in ConnectionList)
+            {
+                Color color, color2;
+                switch (type)
+                {
+                    case 0:
+                        color = Colors[pair++]; pair %= 8;
+                        UIs[s1].Children.Add(new GlueArrow() { ArrowBrush = new SolidColorBrush(color) });
+                        if (s1 != s2) UIs[s2].Children.Add(new GlueArrow() { ArrowBrush = new SolidColorBrush(color) });
+                        break;
+                    case 1:
+                        color = Colors[pair++]; pair %= 8;
+                        if (s1 == s2) UIs[s1].Columns = 2;
+                        UIs[s1].Children.Add(new GlueArrow() { ArrowBrush = new SolidColorBrush(color) });
+                        UIs[s2].Children.Add(new GlueArrow()
+                        {
+                            ArrowBrush = new SolidColorBrush(color),
+                            LayoutTransform = new ScaleTransform(-1, 1)
+                        });
+                        break;
+                    case 2:
+                        color = Colors[pair++]; pair %= 8;
+                        UIs[s1].Columns = 2;
+                        if (s1 != s2)
+                        {
+                            UIs[s2].Columns = 2;
+                            color2 = Colors[pair++]; pair %= 8;
+                            UIs[s1].Children.Add(new GlueArrow() { ArrowBrush = new SolidColorBrush(color) });
+                            UIs[s1].Children.Add(new GlueArrow() { ArrowBrush = new SolidColorBrush(color2) });
+                            UIs[s2].Children.Add(new GlueArrow() { ArrowBrush = new SolidColorBrush(color2) });
+                            UIs[s2].Children.Add(new GlueArrow() { ArrowBrush = new SolidColorBrush(color) });
+                        }
+                        else
+                        {
+                            UIs[s1].Children.Add(new GlueArrow() { ArrowBrush = new SolidColorBrush(color) });
+                            UIs[s1].Children.Add(new GlueArrow() { ArrowBrush = new SolidColorBrush(color) });
+                        }
+                        break;
+                    case 3:
+                        break;
+                    default:
+                        break;
+                }
+            }
         }
     }
 }

@@ -32,8 +32,17 @@ namespace TopologyChess
                 OnPropertyChanged();
             }
         }
-
-        public Topology CurrentTopology { get; set; } = Topology.Topologies.FirstOrDefault(t => t.Name == "Flat");
+        
+        private Topology _currentTopology = Topology.Topologies.FirstOrDefault(t => t.Name == "Flat");
+        public Topology CurrentTopology
+        {
+            get => _currentTopology;
+            set
+            {
+                _currentTopology = value;
+                OnPropertyChanged();
+            }
+        }
 
         private Move LastMove { get; set; }
 
@@ -283,7 +292,6 @@ namespace TopologyChess
                                     {
                                         From = rook.Position,
                                         To = rpath.Value.P,
-                                        Capture = rpath.Value.P,
                                         MovingPiece = rook,
                                         Path = rpath
                                     };
@@ -292,7 +300,6 @@ namespace TopologyChess
                                     {
                                         From = king.Position,
                                         To = kpath.Value.P,
-                                        Capture = kpath.Value.P,
                                         MovingPiece = king,
                                         Path = kpath,
                                         RookMove = rookMove
@@ -334,9 +341,12 @@ namespace TopologyChess
                     piece.MoveDirections[i] = (IntVector)move.Path.Value.M.Transform((Vector)piece.MoveDirections[i]);
                 }
             }
-            Piece captured = Board[move.Capture].Piece;
-            Players[(Party)(-(int)piece.Color)].Remove(captured);
-            Board[move.Capture].Piece = Piece.Empty;
+            if (move.Capture != null)
+            {
+                IntVector capture = (IntVector)move.Capture;
+                Piece captured = Board[capture].Piece;
+                Players[captured.Color].Remove(captured);
+            }
             Board[move.To].Piece = piece;
             Board[move.From].Piece = Piece.Empty;
         }

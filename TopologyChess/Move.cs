@@ -10,7 +10,7 @@ namespace TopologyChess
         public IntVector To { get; set; }
         public Piece MovingPiece { get; set; }
         public Chain<Step> Path { get; set; }
-        public IntVector Capture { get; set; }
+        public IntVector? Capture { get; set; }
 
         public Move() { }
         public Move(Cell from, Cell to, Chain<Step> path)
@@ -26,7 +26,7 @@ namespace TopologyChess
         {
             From = new(-1, -1),
             To = new(-1, -1),
-            Capture = new(-1, -1),
+            Capture = null,
             MovingPiece = null,
             Path = null
         };

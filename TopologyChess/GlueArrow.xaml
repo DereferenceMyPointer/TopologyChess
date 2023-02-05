@@ -1,0 +1,21 @@
+﻿<UserControl x:Class="TopologyChess.GlueArrow"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:TopologyChess"
+             mc:Ignorable="d" 
+             d:DesignHeight="60" d:DesignWidth="400"
+             x:Name="arrow">
+    <Grid x:Name="grid">
+        <Line X1="0" Y1="0" X2="1" Y2="0"
+              Stroke="{Binding ElementName=arrow, Path=ArrowBrush}" StrokeThickness="10"
+              StrokeStartLineCap="Round" StrokeEndLineCap="Round"
+              Stretch="Uniform" Margin="5,0"/>
+        <Polygon Points="0, 0, 0, 50, 100, 25"
+                 Fill="{Binding ElementName=arrow, Path=ArrowBrush}" MaxHeight="50" 
+                 Stretch="Uniform" Margin="0,10"
+                 StrokeThickness="10" StrokeLineJoin="Round"
+                 HorizontalAlignment="Center" VerticalAlignment="Center"/>
+    </Grid>
+</UserControl>
