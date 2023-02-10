@@ -33,6 +33,13 @@ namespace TopologyChess
 
         public int Size { get; set; }
 
+        public string CellString(Cell cell)
+        {
+            char file = Convert.ToChar(Convert.ToInt32('a') + cell.Position.X);
+            string rank = (Size - cell.Position.Y).ToString();
+            return file + rank;
+        }
+
         public IEnumerator<Cell> GetEnumerator()
             => _board.Cast<Cell>().GetEnumerator();
 
