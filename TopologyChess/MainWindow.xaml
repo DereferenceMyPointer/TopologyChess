@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TopologyChess"
         xmlns:tools3D="clr-namespace:_3DTools;assembly=3DTools"
-        mc:Ignorable="d" SizeToContent="Manual"
+        mc:Ignorable="d"
         Title="Topology Chess" WindowStartupLocation="CenterScreen"
         d:DataContext="{d:DesignInstance local:MainViewModel, IsDesignTimeCreatable=True}"
         Width="1000" Height="600">
@@ -169,9 +169,11 @@
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="20"/>
         </Grid.ColumnDefinitions>
-        <StackPanel Orientation="Horizontal" Grid.ColumnSpan="3">
+        <StackPanel Orientation="Horizontal" Grid.ColumnSpan="2">
             <Button Content="New Game" Margin="5" Padding="10,5" Command="{Binding NewGameCommand}"/>
             <Button Content="Clear" Margin="5" Padding="10,5" Command="{Binding ClearCommand}"/>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Grid.Column="3">
             <ComboBox Margin="10,5" MinWidth="200"
                       ItemsSource="{Binding Topologies, NotifyOnSourceUpdated=True}"
                       SelectedItem="{Binding Chess.CurrentTopology, NotifyOnTargetUpdated=True}"
@@ -180,7 +182,7 @@
         <Viewbox Grid.Row="1" Grid.Column="1">
             <Grid>
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="1*"/>
+                    <RowDefinition Height="1*" />
                     <RowDefinition Height="8*"/>
                     <RowDefinition Height="1*"/>
                 </Grid.RowDefinitions>
@@ -219,17 +221,16 @@
                                     <AmbientLight Color="White"/>
                                 </ModelVisual3D.Content>
                             </ModelVisual3D>
-                            <tools3D:InteractiveVisual3D Geometry="{Binding Mesh}"
+                            <tools3D:InteractiveVisual3D Geometry="{Binding Chess.Mesh}"
                                                          Transform="{StaticResource View3DTransform}"
                                                          IsBackVisible="True" >
                                 <tools3D:InteractiveVisual3D.Visual>
                                     <Border ClipToBounds="True" Child="{StaticResource BoardVisual}"/>
                                 </tools3D:InteractiveVisual3D.Visual>
                             </tools3D:InteractiveVisual3D>
-                            <local:ScreenSpaceLines3D Points="{Binding BorderPoints}"
+                            <local:ScreenSpaceLines3D Points="{Binding Chess.BorderPoints}"
                                                       Color="Black" Thickness="2"
                                                       Transform="{StaticResource View3DTransform}" />
-
                         </Viewport3D.Children>
                     </Viewport3D>
                 </tools3D:Interactive3DDecorator>

@@ -15,27 +15,14 @@ namespace TopologyChess
     {
         public MainViewModel()
         {
-            Chess.Board = new Board(8);
-            TopologyModel.Transform(Mesh, (Point p) => Equations.Klein(p.X, p.Y));
-            BorderPoints = TopologyModel.GetBorder(Mesh);
             Topologies = new ObservableCollection<Topology>(Topology.Topologies);
-
-            /*Step s1 = new Step(new(0, 0), new(0, 0), new Matrix(1, 0, 0, -2, 0, 0));
-            Matrix m2 = s1.M;
-            m2.Invert();
-            MessageBox.Show(m2.ToString());*/
         }
 
         private Game _chess = new Game();
-        private MeshGeometry3D _mesh = TopologyModel.GenerateLattice(8 * 20);
-        private Point3DCollection _border_points = new Point3DCollection();
 
         private ICommand _newGameCommand;
         private ICommand _clearCommand;
         private ICommand _cellCommand;
-
-        public IEnumerable<char> Numbers => "87654321";
-        public IEnumerable<char> Letters => "ABCDEFGH";
 
         public ObservableCollection<Topology> Topologies { get; set; }
 
@@ -47,26 +34,6 @@ namespace TopologyChess
                 _chess = value;
                 OnPropertyChanged();
             }
-        }
-
-        public MeshGeometry3D Mesh
-        {
-            get => _mesh;
-            set
-            {
-                _mesh = value;
-                OnPropertyChanged();
-            }
-        }
-
-        public Point3DCollection BorderPoints
-        { 
-            get => _border_points; 
-            set
-            {
-                _border_points = value;
-                OnPropertyChanged();
-            } 
         }
 
         private double angle = 0;
@@ -87,18 +54,11 @@ namespace TopologyChess
             //SetupBoard();
             //Chess.DefaultSetup();
             //Chess.CurrentTopology = Topology.Topologies.FirstOrDefault(t => t.Name == "Moebius Horizontal");
-            /*var top = Board.CurrentTopology;
-            string str = "";
-            for (int i = 0; i < 4; i++)
-            {
-                str += i.ToString() + ":\n" + top.Connections[i].ToString() + " " + top.WarpMatrices[i] + "\n\n";
-            }
-            MessageBox.Show(str);*/
         });
 
         public ICommand ClearCommand => _clearCommand ??= new RelayCommand(parameter =>
         {
-            Chess.Board = new Board(8);
+            //Chess.Board = new Board(8);
             //PerspAngle = (PerspAngle + 180) % 360;
         });
 
@@ -133,33 +93,6 @@ namespace TopologyChess
             if (selectedCell == null && cell.Piece.Color != Chess.CurrentParty) return false;
             return (selectedCell != null || cell.Piece.Type != PieceType.Empty);
         });
-
-        private void SetupBoard()
-        {
-            Board board = new Board(8);
-            board[0, 7].Piece = new Piece(PieceValue.Rook, Party.White);
-            board[1, 7].Piece = new Piece(PieceValue.Knight, Party.White);
-            board[2, 7].Piece = new Piece(PieceValue.Bishop, Party.White);
-            board[3, 7].Piece = new Piece(PieceValue.Queen, Party.White);
-            board[4, 7].Piece = new Piece(PieceValue.King, Party.White);
-            board[5, 7].Piece = new Piece(PieceValue.Bishop, Party.White);
-            board[6, 7].Piece = new Piece(PieceValue.Knight, Party.White);
-            board[7, 7].Piece = new Piece(PieceValue.Rook, Party.White);  
-            for (int i = 0; i < 8; i++)
-            {
-                board[i, 6].Piece = new Piece(PieceValue.Pawn, Party.White);
-                board[i, 1].Piece = new Piece(PieceValue.Pawn, Party.Black);
-            }
-            board[0, 0].Piece = new Piece(PieceValue.Rook, Party.Black);
-            board[1, 0].Piece = new Piece(PieceValue.Knight, Party.Black);
-            board[2, 0].Piece = new Piece(PieceValue.Bishop, Party.Black);
-            board[3, 0].Piece = new Piece(PieceValue.Queen, Party.Black);
-            board[4, 0].Piece = new Piece(PieceValue.King, Party.Black);
-            board[5, 0].Piece = new Piece(PieceValue.Bishop, Party.Black);
-            board[6, 0].Piece = new Piece(PieceValue.Knight, Party.Black);
-            board[7, 0].Piece = new Piece(PieceValue.Rook, Party.Black);
-            Chess.Board = board;
-        }
 
         public event PropertyChangedEventHandler PropertyChanged;
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)

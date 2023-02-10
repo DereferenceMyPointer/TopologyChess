@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Drawing;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Runtime.ConstrainedExecution;
@@ -11,14 +10,17 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
+using System.Windows.Media.Media3D;
 
 namespace TopologyChess
 {
     public class Game : INotifyPropertyChanged
     {
-        public Game()
+        public Game(int size = 8)
         {
+            Board = new Board(size);
             DefaultSetup();
+            CurrentTopology = Topology.Topologies.FirstOrDefault(t => t.Name == "Flat");
             PossibleMoves = CalculateMoves();
         }
 
@@ -32,14 +34,40 @@ namespace TopologyChess
                 OnPropertyChanged();
             }
         }
-        
-        private Topology _currentTopology = Topology.Topologies.FirstOrDefault(t => t.Name == "Flat");
+
+        private Topology _currentTopology;
         public Topology CurrentTopology
         {
             get => _currentTopology;
             set
             {
                 _currentTopology = value;
+                TopologyModel.Transform(Mesh, (p) => value.Equation(p.X, p.Y)); //
+                BorderPoints = TopologyModel.GetBorder(Mesh);
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(Mesh));
+                OnPropertyChanged(nameof(BorderPoints));
+            }
+        }
+
+        private MeshGeometry3D _mesh = TopologyModel.GenerateLattice(8 * 20);
+        public MeshGeometry3D Mesh
+        {
+            get => _mesh;
+            set
+            {
+                _mesh = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private Point3DCollection _border_points = new Point3DCollection();
+        public Point3DCollection BorderPoints
+        {
+            get => _border_points;
+            set
+            {
+                _border_points = value;
                 OnPropertyChanged();
             }
         }
@@ -99,8 +127,9 @@ namespace TopologyChess
             }
         }
 
-        private bool IsAttacked(IntVector position, Move after = null)
+        private bool IsAttacked(IntVector? position, Move after = null)
         {
+            if (position == null) return false;
             after ??= Move.NoMove;
             Party color = (Party)(-(int)CurrentParty);
             foreach ((IntVector dir, bool slide) in Players[color].AttackDirections)
@@ -108,7 +137,7 @@ namespace TopologyChess
                 int distance = 1;
                 List<Step> stepleads = new List<Step>();
                 List<Step> new_stepleads = new List<Step>();
-                stepleads.Add(new Step(position, -dir, Matrix.Identity));
+                stepleads.Add(new Step((IntVector)position, -dir, Matrix.Identity));
                 do
                 {
                     foreach (var lead in stepleads)
@@ -176,7 +205,7 @@ namespace TopologyChess
                         if (!moves.Any(m => m.To == to.Position))
                         {
                             Move move = new Move(from, to, lead);
-                            if (!IsAttacked(piece == king ? to.Position : king.Position, move))
+                            if (!IsAttacked(piece == king ? to.Position : king?.Position, move))
                                 moves.Add(move);
                         }
                     }
@@ -200,7 +229,7 @@ namespace TopologyChess
                         if (to.Piece.Type == PieceType.Empty && !moves.Any(m => m.To == to.Position))
                         {
                             Move move = new Move(from, to, push);
-                            if (!IsAttacked(king.Position, move))
+                            if (!IsAttacked(king?.Position, move))
                                 moves.Add(move);
                         }
                     }
@@ -230,7 +259,7 @@ namespace TopologyChess
                             if (to == enPassant) takemove.Capture = LastMove.To;
                             if (!moves.Any(m => m.To == to.Position))
                             {
-                                if (!IsAttacked(king.Position, takemove))
+                                if (!IsAttacked(king?.Position, takemove))
                                     moves.Add(takemove);
                             }
                         }
@@ -345,7 +374,8 @@ namespace TopologyChess
             {
                 IntVector capture = (IntVector)move.Capture;
                 Piece captured = Board[capture].Piece;
-                Players[captured.Color].Remove(captured);
+                if (captured.Color != Party.None)
+                    Players[captured.Color].Remove(captured);
             }
             Board[move.To].Piece = piece;
             Board[move.From].Piece = Piece.Empty;
