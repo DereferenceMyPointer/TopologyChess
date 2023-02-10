@@ -51,12 +51,6 @@ namespace TopologyChess
             0.5 * Sin(Tau * v)
         );
 
-        public static Point3D ProjectivePlaneNo(double u, double v) => new(
-            Sqrt(1 + u * u + v * v) * u,
-            Sqrt(1 + u * u + v * v) * v,
-            0
-        );
-
         public static Point3D ProjectivePlane(double u, double v)
         {
             double x = 2 * u - 1;
