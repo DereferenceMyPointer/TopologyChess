@@ -28,15 +28,15 @@ namespace TopologyChess
             _board = new Cell[size, size];
             for (int i = 0; i < size; i++)
                 for (int j = 0; j < size; j++)
-                    this[i, j] = new Cell(i, j);
+                    this[i, j] = new Cell(i, j) { Notation = ToNotation(i, j) };
         }
 
         public int Size { get; set; }
 
-        public string CellString(Cell cell)
+        public string ToNotation(int x, int y)
         {
-            char file = Convert.ToChar(Convert.ToInt32('a') + cell.Position.X);
-            string rank = (Size - cell.Position.Y).ToString();
+            char file = Convert.ToChar(Convert.ToInt32('a') + x);
+            string rank = (Size - y).ToString();
             return file + rank;
         }
 

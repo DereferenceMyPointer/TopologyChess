@@ -55,14 +55,11 @@ namespace TopologyChess
         public bool Highlighted => Move != null;
         public double MoveAngle => Move?.Path.Value.V.Angle ?? 0;
 
-
-        public override string ToString()
-        {
-            return Position.ToString();
-        }
+        public string Notation { get; set; }
+        public override string ToString() => Notation;
 
         public event PropertyChangedEventHandler PropertyChanged;
-        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        public virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
             => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 }

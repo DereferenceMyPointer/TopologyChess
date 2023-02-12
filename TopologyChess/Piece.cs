@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -30,17 +32,17 @@ namespace TopologyChess
     {
         public Piece(PieceValue value, Party color)
         {
-            Value = value;
             Color = color;
-            Type = (PieceType)((int)value * (int)color);
+            Value = value;
+            if (Color == Party.Black) RenderTransform.Matrix = new Matrix(-1, 0, 0, -1, 0, 0);
             SetMoveDirections();
         }
 
         public Piece(PieceType type)
         {
-            Value = (PieceValue)Math.Abs((int)type);
             Color = (Party)Math.Sign((int)type);
-            Type = type;
+            Value = (PieceValue)Math.Abs((int)type);
+            if (Color == Party.Black) RenderTransform.Matrix = new Matrix(-1, 0, 0, -1, 0, 0);
             SetMoveDirections();
         }
 
@@ -76,10 +78,19 @@ namespace TopologyChess
             }
         }
 
-        public PieceValue Value { get; }
-        public Party Color { get; }
+        private PieceValue _value;
+        public PieceValue Value
+        {
+            get => _value;
+            set
+            {
+                _value = value;
+                SetMoveDirections();
+            }
+        }
+        public Party Color { get; set; }
 
-        public PieceType Type { get; }
+        public PieceType Type => (PieceType)((int)Value * (int)Color);
 
         public bool Slides => Value == PieceValue.Bishop || Value == PieceValue.Rook || Value == PieceValue.Queen;
 

@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows;
+using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Media3D;
@@ -48,6 +49,17 @@ namespace TopologyChess
             }
         }
 
+        private string hoverCellNotation = "";
+        public string HoverCellNotation
+        {
+            get => hoverCellNotation;
+            set
+            {
+                hoverCellNotation = value;
+                OnPropertyChanged();
+            }
+        }
+
         public ICommand NewGameCommand => _newGameCommand ??= new RelayCommand(parameter => 
         {
             Chess = new Game();
@@ -65,6 +77,10 @@ namespace TopologyChess
         private Cell selectedCell;
         public ICommand CellCommand => _cellCommand ??= new RelayCommand(parameter =>
         {
+            if (parameter is not Cell cell) return;
+            if (selectedCell == null && cell.Piece.Color != Chess.CurrentParty) return;
+            if (!(selectedCell != null || cell.Piece.Type != PieceType.Empty)) return;
+
             Cell clickedCell = (Cell)parameter;
             if (selectedCell == null)
             {
@@ -87,11 +103,22 @@ namespace TopologyChess
                 selectedCell = null;
                 foreach (Cell c in Chess.Board) c.Move = null;
             }
-        }, parameter =>
+        }, parameter => !Chess.IsBlocked
+        /*, parameter =>
         {
             if (parameter is not Cell cell) return false;
             if (selectedCell == null && cell.Piece.Color != Chess.CurrentParty) return false;
             return (selectedCell != null || cell.Piece.Type != PieceType.Empty);
+        }*/);
+
+        private ICommand _setPieceCommand;
+        public ICommand SetPieceCommand => _setPieceCommand ??= new RelayCommand(parameter =>
+        {
+            Cell cell = (Cell)parameter;
+            /*PieceSelect select = new PieceSelect(Party.None, cell);
+            //select.Selected += (sender, e) => { };
+            select.Show();*/
+            MessageBox.Show(cell.Piece.Value.ToString());
         });
 
         public event PropertyChangedEventHandler PropertyChanged;

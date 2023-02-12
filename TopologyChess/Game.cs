@@ -9,6 +9,8 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Media;
 using System.Windows.Media.Media3D;
 
@@ -388,6 +390,25 @@ namespace TopologyChess
                 Execute(castle.RookMove);
             }
             Execute(move);
+
+            if (move.MovingPiece.Value == PieceValue.Pawn &&
+                Topology.Sides(move.To + move.MovingPiece.MoveDirections[0], Board.Size).Any())
+            {
+                PieceSelect promotion = new PieceSelect(move.MovingPiece.Color, Board[move.To]);
+                IsBlocked = true;
+                promotion.Selected += (p) =>
+                {
+                    move.MovingPiece = p;
+                    IsBlocked = false;
+                    AfterPlay(move);
+                };
+                promotion.Show();
+            }
+            else AfterPlay(move);
+        }
+
+        private void AfterPlay(Move move)
+        {
             LastMove = move;
             History.Add(move);
             CurrentParty = (Party)(-(int)CurrentParty);
@@ -400,6 +421,17 @@ namespace TopologyChess
         {
             //
             MessageBox.Show("End");
+        }
+
+        private bool _isBlocked = false;
+        public bool IsBlocked
+        {
+            get => _isBlocked;
+            set
+            {
+                _isBlocked = value;
+                OnPropertyChanged();
+            }
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

@@ -3,6 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
         xmlns:local="clr-namespace:TopologyChess"
         xmlns:tools3D="clr-namespace:_3DTools;assembly=3DTools"
         mc:Ignorable="d"
@@ -23,128 +24,34 @@
             <ItemsControl ItemsSource="{Binding Chess.Board, NotifyOnSourceUpdated=True}" Width="800" Height="800">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <Grid RenderTransformOrigin="0.5,0.5">
-                            <Grid.RenderTransform>
-                                <RotateTransform Angle="{Binding DataContext.PerspAngle, RelativeSource={RelativeSource AncestorType=Window}}"/>
-                            </Grid.RenderTransform>
-                            <Grid.Style>
-                                <Style TargetType="{x:Type Grid}">
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding Color}" Value="0">
-                                            <Setter Property="Background" Value="SandyBrown"/>
-                                        </DataTrigger>
-                                        <DataTrigger Binding="{Binding Color}" Value="1">
-                                            <Setter Property="Background" Value="Bisque"/>
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </Grid.Style>
-                            <Viewbox>
-                                <Image RenderTransformOrigin="0.5,0.5" RenderTransform="{Binding Piece.RenderTransform}">
-                                    <Image.Style>
-                                        <Style TargetType="Image">
-                                            <Setter Property="Visibility" Value="Visible"/>
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding Piece.Type}" Value="Empty">
-                                                    <Setter Property="Visibility" Value="Collapsed"/>
-                                                </DataTrigger>
-                                                <DataTrigger Binding="{Binding Piece.Type}" Value="WhitePawn">
-                                                    <Setter Property="Source" Value="{StaticResource wPDrawingImage}" />
-                                                </DataTrigger>
-                                                <DataTrigger Binding="{Binding Piece.Type}" Value="BlackPawn">
-                                                    <Setter Property="Source" Value="{StaticResource bPDrawingImage}" />
-                                                </DataTrigger>
-                                                <DataTrigger Binding="{Binding Piece.Type}" Value="WhiteKnight">
-                                                    <Setter Property="Source" Value="{StaticResource wNDrawingImage}" />
-                                                </DataTrigger>
-                                                <DataTrigger Binding="{Binding Piece.Type}" Value="BlackKnight">
-                                                    <Setter Property="Source" Value="{StaticResource bNDrawingImage}" />
-                                                </DataTrigger>
-                                                <DataTrigger Binding="{Binding Piece.Type}" Value="WhiteBishop">
-                                                    <Setter Property="Source" Value="{StaticResource wBDrawingImage}" />
-                                                </DataTrigger>
-                                                <DataTrigger Binding="{Binding Piece.Type}" Value="BlackBishop">
-                                                    <Setter Property="Source" Value="{StaticResource bBDrawingImage}" />
-                                                </DataTrigger>
-                                                <DataTrigger Binding="{Binding Piece.Type}" Value="WhiteRook">
-                                                    <Setter Property="Source" Value="{StaticResource wRDrawingImage}" />
-                                                </DataTrigger>
-                                                <DataTrigger Binding="{Binding Piece.Type}" Value="BlackRook">
-                                                    <Setter Property="Source" Value="{StaticResource bRDrawingImage}" />
-                                                </DataTrigger>
-                                                <DataTrigger Binding="{Binding Piece.Type}" Value="WhiteQueen">
-                                                    <Setter Property="Source" Value="{StaticResource wQDrawingImage}" />
-                                                </DataTrigger>
-                                                <DataTrigger Binding="{Binding Piece.Type}" Value="BlackQueen">
-                                                    <Setter Property="Source" Value="{StaticResource bQDrawingImage}" />
-                                                </DataTrigger>
-                                                <DataTrigger Binding="{Binding Piece.Type}" Value="WhiteKing">
-                                                    <Setter Property="Source" Value="{StaticResource wKDrawingImage}" />
-                                                </DataTrigger>
-                                                <DataTrigger Binding="{Binding Piece.Type}" Value="BlackKing">
-                                                    <Setter Property="Source" Value="{StaticResource bKDrawingImage}" />
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </Image.Style>
-                                </Image>
-                            </Viewbox>
-                            <Grid>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="1*"/>
-                                    <RowDefinition Height="8*"/>
-                                    <RowDefinition Height="1*"/>
-                                </Grid.RowDefinitions>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="1*"/>
-                                    <ColumnDefinition Width="8*"/>
-                                    <ColumnDefinition Width="1*"/>
-                                </Grid.ColumnDefinitions>
-                                <Path Grid.Row="1" Grid.Column="1" RenderTransformOrigin="0.5,0.5"
-                                    Stroke="Red" StrokeThickness="10" Opacity="0.7" Stretch="Uniform"
-                                    StrokeStartLineCap="Round" StrokeEndLineCap="Round">
-                                    <Path.Data>
-                                        <GeometryGroup FillRule="Nonzero">
-                                            <LineGeometry StartPoint="20,50" EndPoint="80,50" />
-                                            <LineGeometry StartPoint="60,30" EndPoint="80,50" />
-                                            <LineGeometry StartPoint="60,70" EndPoint="80,50" />
-                                        </GeometryGroup>
-                                    </Path.Data>
-                                    <Path.RenderTransform>
-                                        <RotateTransform Angle="{Binding MoveAngle}"/>
-                                    </Path.RenderTransform>
-                                    <Path.Style>
-                                        <Style TargetType="{x:Type Path}">
-                                            <Setter Property="Visibility" Value="Collapsed"/>
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding Highlighted}" Value="True">
-                                                    <Setter Property="Visibility" Value="Visible"/>
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </Path.Style>
-                                </Path>
-                                <Border Grid.Row="1" Grid.Column="1" Opacity="0.2">
-                                    <Border.Style>
-                                        <Style TargetType="{x:Type Border}">
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding Selected}" Value="True">
-                                                    <Setter Property="Background" Value="Lime"/>
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </Border.Style>
-                                </Border>
-                            </Grid>
-                            <Button Command="{Binding DataContext.CellCommand, RelativeSource={RelativeSource AncestorType=Window}}"
-                                CommandParameter="{Binding}" OverridesDefaultStyle="True">
-                                <Button.Template>
-                                    <ControlTemplate>
-                                        <Border Background="Transparent"/>
-                                    </ControlTemplate>
-                                </Button.Template>
-                            </Button>
-                        </Grid>
+                        <Button OverridesDefaultStyle="True"
+                                Command="{Binding DataContext.CellCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                CommandParameter="{Binding}">
+                            <i:Interaction.Triggers>
+                                <i:EventTrigger EventName="MouseEnter">
+                                    <i:ChangePropertyAction
+                                        TargetObject="{Binding DataContext, RelativeSource={RelativeSource AncestorType=Window}}"
+                                        PropertyName="HoverCellNotation"
+                                        Value="{Binding Notation}"/>
+                                </i:EventTrigger>
+                                <i:EventTrigger EventName="MouseLeave">
+                                    <i:ChangePropertyAction
+                                        TargetObject="{Binding DataContext, RelativeSource={RelativeSource AncestorType=Window}}"
+                                        PropertyName="HoverCellNotation"
+                                        Value=""/>
+                                </i:EventTrigger>
+                                <!--i:EventTrigger EventName="MouseRightButtonDown">
+                                    <i:InvokeCommandAction
+                                        Command="{Binding DataContext.SetPieceCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                        CommandParameter="{Binding}"/>
+                                </i:EventTrigger-->
+                            </i:Interaction.Triggers>
+                            <Button.Template>
+                                <ControlTemplate>
+                                    <local:CellControl Cell="{Binding}"/>
+                                </ControlTemplate>
+                            </Button.Template>
+                        </Button>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
                 <ItemsControl.ItemsPanel>
@@ -205,6 +112,9 @@
                                 Content="{Binding Chess.CurrentTopology.UIs[2], NotifyOnSourceUpdated=True}"/>
                 <ContentControl Grid.Row="1" Grid.Column="0"
                                 Content="{Binding Chess.CurrentTopology.UIs[3], NotifyOnSourceUpdated=True}"/>
+                <Viewbox Grid.Row="2" Grid.Column="2">
+                    <TextBlock Text="{Binding HoverCellNotation}"/>
+                </Viewbox>
             </Grid>
         </Viewbox>
         <!--GridSplitter Grid.Row="1" Grid.Column="2" Width="20" VerticalAlignment="Stretch"/-->
