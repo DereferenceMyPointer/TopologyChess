@@ -2,6 +2,12 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
+/** Notation conversion and packing class
+ * Should support txt and possibly other export and import formats
+ * Currently projected to store board states as move sequences
+ */
+
+
 namespace TopologyChess
 {
     public class NotationPacker
@@ -31,7 +37,7 @@ namespace TopologyChess
                 if(move is Castle castle)
                 {
                     // Figure out how to convert castle logic into notation - probably k(king coordinates initial):k(king coordinates final)
-                    outp += "OO,";
+                    outp += "k" + move.From.X + "" + move.From.Y + ":" + move.From.X + "" + move.From.Y + ",";
                 }
                 else
                 {
@@ -39,8 +45,37 @@ namespace TopologyChess
                 }
                 
             }
-            return outp.Substring(0, outp.Length - 1);
-        }   
+            return outp[..^1];
+        }
+
+        public List<Move> StringToMoveList(string text)
+        {
+            List<Move> moves = new List<Move>();
+            foreach (string s in text.Split(','))
+            {
+                if (s[0] == 'k')
+                {
+                    // Implement using Game castling strategy - would be much easier with delegated move handling
+                    moves.Add(new Castle().RookMove);
+                } else if (Char.IsLetter(s[0])) {
+                    moves.Add(new Move.BoardTransformation(new TopologyChange()
+                    {
+                        FromTopology = TopologyDictionary[s[0..1]],
+                        ToTopology = TopologyDictionary[s[3..4]]
+                    }));
+                } else
+                {
+                    // Need access to moving piece for current system - would need to
+                    // actually perform moves on a board to do this as of right now
+                    moves.Add(new Move(){
+                        From = new IntVector(s[0], s[1]),
+                        To = new IntVector(s[3], s[4])
+                    });
+                }
+            }
+
+            return moves;
+        }
 
     }
 }

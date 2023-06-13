@@ -29,15 +29,26 @@ namespace TopologyChess
                 return outputMove;
             }
 
-            public Move BoardTransformationMove(Topology topology, Game game)
+            public BoardTransformation(Topology topology, Game game)
             {
-                Move outputMove = NoMove;
-                outputMove.TopologyChange = new TopologyChange
+                this.From = NoMove.From;
+                this.To = NoMove.To;
+                this.MovingPiece = NoMove.MovingPiece;
+                this.Path = NoMove.Path;
+                this.TopologyChange = new TopologyChange
                 {
                     FromTopology = game.CurrentTopology,
                     ToTopology = topology
                 };
-                return outputMove;
+            }
+
+            public BoardTransformation(TopologyChange change)
+            {
+                this.From = NoMove.From;
+                this.To = NoMove.To;
+                this.MovingPiece = NoMove.MovingPiece;
+                this.Path = NoMove.Path;
+                this.TopologyChange = change;
             }
         }
     }
