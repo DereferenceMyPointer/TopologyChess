@@ -11,7 +11,7 @@ using System.Windows.Media.Media3D;
 
 namespace TopologyChess
 {
-    public class Topology
+    public partial class Topology
     {
         public static List<Topology> Topologies;
 
@@ -26,74 +26,75 @@ namespace TopologyChess
             };
 
             Topologies = new List<Topology>() {
-                new Topology("Flat"),
-                new Topology("Cylinder Vertical", (3, 1, 1))
+                new Topology("Flat", "F0"),
+                new Topology("Cylinder Vertical", "C1", (3, 1, 1))
                 {
                     Equation = Equations.Cylinder
                 },
-                new Topology("Cylinder Horizontal", (0, 2, 1))
+                new Topology("Cylinder Horizontal", "C2",(0, 2, 1))
                 {
                     Equation = Equations.Tilt(Equations.Cylinder)
                 },
-                new Topology("Moebius Vertical", (3, 1, 0))
+                new Topology("Moebius Vertical", "M1", (3, 1, 0))
                 {
                     Equation = Equations.Moebius
                 },
-                new Topology("Moebius Horizontal", (0, 2, 0))
+                new Topology("Moebius Horizontal", "M2", (0, 2, 0))
                 {
                     Equation = Equations.Tilt(Equations.Moebius)
                 },
-                new Topology("Torus", (3, 1, 1), (0, 2, 1))
+                new Topology("Torus", "T0", (3, 1, 1), (0, 2, 1))
                 {
                     Equation = Equations.Torus
                 },
-                new Topology("Real Projective Plane", (3, 1, 0), (0, 2, 0))
+                new Topology("Real Projective Plane", "R0", (3, 1, 0), (0, 2, 0))
                 {
                     Equation = Equations.ProjectivePlane
                 },
-                new Topology("Klein Vertical", (3, 1, 1), (0, 2, 0))
+                new Topology("Klein Vertical", "K1", (3, 1, 1), (0, 2, 0))
                 {
                     Equation = Equations.Tilt(Equations.Klein)
                 },
-                new Topology("Klein Horizontal", (3, 1, 0), (0, 2, 1))
+                new Topology("Klein Horizontal", "K2", (3, 1, 0), (0, 2, 1))
                 {
                     Equation = Equations.Klein
                 },
-                new Topology("Globe Vertical", (3, 1, 1), (0, 0, 2), (2, 2, 2))
+                new Topology("Globe Vertical", "G1", (3, 1, 1), (0, 0, 2), (2, 2, 2))
                 {
                     Equation = Equations.Globe
                 },
-                new Topology("Globe Horizontal", (0, 2, 1), (1, 1, 2), (3, 3, 2))
+                new Topology("Globe Horizontal", "G2", (0, 2, 1), (1, 1, 2), (3, 3, 2))
                 {
                     Equation = Equations.Tilt(Equations.Globe)
                 },
-                new Topology("Pillow Vertical", (3, 1, 1), (0, 0, 1), (2, 2, 1))
+                new Topology("Pillow Vertical", "P1", (3, 1, 1), (0, 0, 1), (2, 2, 1))
                 {
                     Equation = Equations.Pillow
                 },
-                new Topology("Pillow Horizontal", (0, 2, 1), (1, 1, 1), (3, 3, 1))
+                new Topology("Pillow Horizontal", "P2", (0, 2, 1), (1, 1, 1), (3, 3, 1))
                 {
                     Equation = Equations.Tilt(Equations.Pillow)
                 },
-                new Topology("Sphere Right", (3, 0, 1), (1, 2, 1))
+                new Topology("Sphere Right", "S3", (3, 0, 1), (1, 2, 1))
                 {
                     Equation = Equations.SphereR
                 },
-                new Topology("Sphere Left", (0, 1, 1), (2, 3, 1))
+                new Topology("Sphere Left", "S4", (0, 1, 1), (2, 3, 1))
                 {
                     Equation = Equations.SphereL
                 },
-                new Topology("Klein Right", (0, 3, 0), (1, 2, 0)),
-                new Topology("Klein Left", (0, 1, 0), (2, 3, 0)),
-                new Topology("Mirror Vertical", (3, 3, 0), (1, 1, 0)),
-                new Topology("Mirror Horizontal", (0, 0, 0), (2, 2, 0)),
-                new Topology("Mirror Hall", (0, 0, 0), (1, 1, 0), (2, 2, 0), (3, 3, 0))
+                new Topology("Klein Right", "K3", (0, 3, 0), (1, 2, 0)),
+                new Topology("Klein Left", "K4", (0, 1, 0), (2, 3, 0)),
+                new Topology("Mirror Vertical", "H1", (3, 3, 0), (1, 1, 0)),
+                new Topology("Mirror Horizontal", "H2",(0, 0, 0), (2, 2, 0)),
+                new Topology("Mirror Hall", "H5", (0, 0, 0), (1, 1, 0), (2, 2, 0), (3, 3, 0))
             };
         }
         
-        public Topology(string name, params (int side1, int side2, int type)[] connection_list)
+        public Topology(string name, string id, params (int side1, int side2, int type)[] connection_list)
         {
             Name = name;
+            Id = id;
             ConnectionList = connection_list.ToList();
             Connections = new int[4] { -1, -1, -1, -1 };
             Types = new int[4] { -1, -1, -1, -1 };
@@ -109,6 +110,8 @@ namespace TopologyChess
         }
 
         public string Name { get; }
+
+        public string Id { get; }
 
         public Func<double, double, Point3D> Equation { get; set; } = Equations.Flat;
 
