@@ -12,7 +12,7 @@ using System.Windows.Media.Media3D;
 
 namespace TopologyChess
 {
-    public class MainViewModel : INotifyPropertyChanged
+    public partial class MainViewModel : INotifyPropertyChanged
     {
         public MainViewModel()
         {

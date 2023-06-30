@@ -16,7 +16,7 @@ using System.Windows.Media.Media3D;
 
 namespace TopologyChess
 {
-    public class Game : INotifyPropertyChanged
+    public partial class Game : INotifyPropertyChanged
     {
         public Game(int size = 8)
         {
@@ -237,7 +237,8 @@ namespace TopologyChess
                     }
                 }
                 Cell enPassant = null;
-                if (LastMove != null &&
+                // ERROR BANDAID FIX - IGNORE TOPOLOGY MOVE
+                if (LastMove != null && LastMove.TopologyChange == null &&
                     LastMove.MovingPiece.Value == PieceValue.Pawn &&
                     LastMove.MovingPiece.Color != pawn.Color &&
                     LastMove.Path.Count() == 3)
@@ -377,14 +378,26 @@ namespace TopologyChess
                 IntVector capture = (IntVector)move.Capture;
                 Piece captured = Board[capture].Piece;
                 if (captured.Color != Party.None)
+                {
                     Players[captured.Color].Remove(captured);
+                    Board[capture].Piece = Piece.Empty;
+                }
             }
-            Board[move.To].Piece = piece;
             Board[move.From].Piece = Piece.Empty;
+            Board[move.To].Piece = piece;
         }
 
+
+        // if move is BoardTransformation
+        // --> Don't execute as normal, do board transform and then AfterPlay(move)
         public void Play(Move move)
         {
+            if (move.TopologyChange != null)
+            {
+                CurrentTopology = move.TopologyChange?.ToTopology;
+                AfterPlay(move);
+                return;
+            }
             if (move is Castle castle)
             {
                 Execute(castle.RookMove);
