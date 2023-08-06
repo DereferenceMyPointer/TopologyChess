@@ -31,7 +31,7 @@ namespace TopologyChess
                 {
                     Equation = Equations.Cylinder
                 },
-                new Topology("Cylinder Horizontal", "C2",(0, 2, 1))
+                new Topology("Cylinder Horizontal", "C2", (0, 2, 1))
                 {
                     Equation = Equations.Tilt(Equations.Cylinder)
                 },
