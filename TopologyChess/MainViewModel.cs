@@ -19,26 +19,15 @@ namespace TopologyChess
             Topologies = new ObservableCollection<Topology>(Topology.Topologies);
         }
 
-        private Game _chess = new Game();
-
         private ICommand _newGameCommand;
         private ICommand _clearCommand;
         private ICommand _cellCommand;
 
         public ObservableCollection<Topology> Topologies { get; set; }
 
-        public Game Chess
-        {
-            get => _chess;
-            set
-            {
-                _chess = value;
-                OnPropertyChanged();
-            }
-        }
+        public Game Chess => Game.Instance;
 
         private double angle = 0;
-        //private RotateTransform _persp = new RotateTransform();
         public double PerspAngle
         {
             get => angle;
@@ -62,10 +51,8 @@ namespace TopologyChess
 
         public ICommand NewGameCommand => _newGameCommand ??= new RelayCommand(parameter => 
         {
-            Chess = new Game();
-            //SetupBoard();
-            //Chess.DefaultSetup();
-            //Chess.CurrentTopology = Topology.Topologies.FirstOrDefault(t => t.Name == "Moebius Horizontal");
+            Game.NewGame();
+            OnPropertyChanged(nameof(Chess));
         });
 
         public ICommand ClearCommand => _clearCommand ??= new RelayCommand(parameter =>
@@ -78,13 +65,15 @@ namespace TopologyChess
         public ICommand CellCommand => _cellCommand ??= new RelayCommand(parameter =>
         {
             if (parameter is not Cell cell) return;
+            if (!Chess.AvailibleParties.Contains(Chess.CurrentParty)) return;
             if (selectedCell == null && cell.Piece.Color != Chess.CurrentParty) return;
             if (!(selectedCell != null || cell.Piece.Type != PieceType.Empty)) return;
-
+            
             Cell clickedCell = (Cell)parameter;
             if (selectedCell == null)
             {
                 if (!Chess.PossibleMoves.TryGetValue(clickedCell, out List<Move> moves)) return;
+                
                 clickedCell.Selected = true;
                 selectedCell = clickedCell;
                 foreach (Move move in moves)
@@ -103,13 +92,7 @@ namespace TopologyChess
                 selectedCell = null;
                 foreach (Cell c in Chess.Board) c.Move = null;
             }
-        }, parameter => !Chess.IsBlocked
-        /*, parameter =>
-        {
-            if (parameter is not Cell cell) return false;
-            if (selectedCell == null && cell.Piece.Color != Chess.CurrentParty) return false;
-            return (selectedCell != null || cell.Piece.Type != PieceType.Empty);
-        }*/);
+        }, parameter => !Chess.IsBlocked);
 
         private ICommand _setPieceCommand;
         public ICommand SetPieceCommand => _setPieceCommand ??= new RelayCommand(parameter =>

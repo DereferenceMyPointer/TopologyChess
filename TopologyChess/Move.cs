@@ -65,5 +65,4 @@ namespace TopologyChess
     {
         public Move RookMove { get; set; }
     }
-
 }

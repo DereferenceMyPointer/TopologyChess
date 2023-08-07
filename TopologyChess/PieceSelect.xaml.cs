@@ -17,9 +17,8 @@ namespace TopologyChess
 {
     public partial class PieceSelect : UserControl
     {
-        public PieceSelect(Game game, Party type, Cell target)
+        public PieceSelect(Party type, Cell target)
         {
-            Game = game;
             Type = type;
             TargetCell = target;
             Cells = new List<Cell>();
@@ -54,7 +53,7 @@ namespace TopologyChess
                 {
                     Cells.Add(new Cell(i, j)
                     {
-                        Piece = value == PieceValue.None ? Piece.Empty : Piece.New(Game, value, color)
+                        Piece = value == PieceValue.None ? Piece.Empty : Piece.New(value, color)
                     });
                     j++;
                 }
@@ -64,7 +63,6 @@ namespace TopologyChess
         }
 
         private Party Type { get; }
-        private Game Game { get; }
 
         public int UGColumns { get; }
         public int UGRows { get; }

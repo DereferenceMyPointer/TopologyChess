@@ -32,42 +32,44 @@ namespace TopologyChess
 
     public class Piece
     {
-        protected Piece(Game game, PieceValue value, Party color)
+        protected Piece(PieceValue value, Party color)
         {
-            Game = game;
             Color = color;
             Value = value;
-            if (Color == Party.Black) RenderTransform.Matrix = new Matrix(-1, 0, 0, -1, 0, 0);
             Game.Players[color].Add(this);
+            SetMovement();
+            if (Color == Party.Black) RenderMatrix = new Matrix(-1, 0, 0, -1, 0, 0);
         }
 
-        public static Piece New(Game game, PieceValue value, Party color)
+        public static Piece New(PieceValue value, Party color)
         {
             switch (value)
             {
                 case PieceValue.Pawn:
-                    return new Pawn(game, color);
+                    return new Pawn(color);
                 case PieceValue.Knight:
-                    return new Knight(game, color);
+                    return new Knight(color);
                 case PieceValue.Bishop:
-                    return new Bishop(game, color);
+                    return new Bishop(color);
                 case PieceValue.Rook:
-                    return new Rook(game, color);
+                    return new Rook(color);
                 case PieceValue.Queen:
-                    return new Queen(game, color);
+                    return new Queen(color);
                 case PieceValue.King:
-                    return new King(game, color);
+                    return new King(color);
                 default:
                     return Empty;
             }
         }
 
-        public static Piece New(Game game, PieceType type)
+        public static Piece New(PieceType type)
         {
-            return New(game, (PieceValue)Math.Abs((int)type), (Party)Math.Sign((int)type));
+            return New((PieceValue)Math.Abs((int)type), (Party)Math.Sign((int)type));
         }
 
-        protected Game Game { get; }
+        protected Game Game => Game.Instance;
+
+        protected virtual void SetMovement() { }
 
         public PieceValue Value { get; set; }
 
@@ -79,10 +81,25 @@ namespace TopologyChess
 
         public bool HasMoved { get; set; } = false;
 
-        public MatrixTransform RenderTransform { get; set; } = new MatrixTransform();
+        public MatrixTransform RenderTransform { get; } = new MatrixTransform();
+
+        public Matrix RenderMatrix
+        {
+            get => RenderTransform.Matrix;
+            set
+            {
+                RenderTransform.Matrix = value;
+                for (int i = 0; i < MoveDirections.Length; i++)
+                {
+                    MoveDirections[i] = (IntVector)value.Transform((Vector)MoveDirections[i]);
+                }
+            }
+        }
 
         public IntVector[] MoveDirections { get; set; }
+        
         public virtual IntVector[] AttackDirections { get => MoveDirections; }
+        
         public IntVector Position { get; set; }
 
         private Piece()
@@ -97,7 +114,7 @@ namespace TopologyChess
         {
             List<Move> moves = new List<Move>();
             Cell from = Game.Board[Position];
-            Piece king = Game.Players[Color].Pieces.FirstOrDefault(p => p.Value == PieceValue.King);
+            Piece king = Game.Players[Color].King;
             int distance = 0;
             List<Chain<Step>> leads = new List<Chain<Step>>();
             List<Chain<Step>> new_leads = new List<Chain<Step>>();
@@ -128,7 +145,7 @@ namespace TopologyChess
                     if (!moves.Any(m => m.To == to.Position))
                     {
                         Move move = new Move(from, to, lead);
-                        if (!Game.IsAttacked(this == king ? to.Position : king?.Position, move))
+                        if (!Game.IsAttacked(this == king ? to.Position : king.Position, move))
                             moves.Add(move);
                         else if (include_illegal)
                             moves.Add(move);
@@ -142,12 +159,12 @@ namespace TopologyChess
 
     public class Pawn : Piece
     {
-        public Pawn(Game game, Party color)
-            : base(game, PieceValue.Pawn, color)
+        public Pawn(Party color) : base(PieceValue.Pawn, color) { }
+
+        protected override void SetMovement()
         {
             Slides = false;
-            int d = -(int)Color;
-            MoveDirections = new IntVector[] { new(0, d), new(-1, d), new(1, d) };
+            MoveDirections = new IntVector[] { new(0, -1), new(-1, -1), new(1, -1) };
         }
 
         public override IntVector[] AttackDirections
@@ -159,7 +176,7 @@ namespace TopologyChess
         {
             List<Move> moves = new List<Move>();
             Cell from = Game.Board[Position];
-            Piece king = Game.Players[Color].Pieces.FirstOrDefault(p => p.Value == PieceValue.King);
+            Piece king = Game.Players[Color].King;
             Chain<Step> push = new Chain<Step>(
                 new Step(Position, MoveDirections[0], Matrix.Identity)
             );
@@ -174,7 +191,7 @@ namespace TopologyChess
                     if (to.Piece.Type == PieceType.Empty && !moves.Any(m => m.To == to.Position))
                     {
                         Move move = new Move(from, to, push);
-                        if (!Game.IsAttacked(this == king ? to.Position : king?.Position, move))
+                        if (!Game.IsAttacked(this == king ? to.Position : king.Position, move))
                             moves.Add(move);
                         else if (include_illegal)
                             moves.Add(move);
@@ -207,7 +224,7 @@ namespace TopologyChess
                         if (to == enPassant) takemove.Capture = Game.LastMove.To;
                         if (!moves.Any(m => m.To == to.Position))
                         {
-                            if (!Game.IsAttacked(king?.Position, takemove))
+                            if (!Game.IsAttacked(king.Position, takemove))
                                 moves.Add(takemove);
                             else if (include_illegal)
                                 moves.Add(takemove);
@@ -221,8 +238,9 @@ namespace TopologyChess
 
     public class Knight : Piece
     {
-        public Knight(Game game, Party color)
-            : base(game, PieceValue.Knight, color)
+        public Knight(Party color) : base(PieceValue.Knight, color) { }
+
+        protected override void SetMovement()
         {
             Slides = false;
             MoveDirections = new IntVector[] {
@@ -234,8 +252,9 @@ namespace TopologyChess
 
     public class Bishop : Piece
     {
-        public Bishop(Game game, Party color)
-            : base(game, PieceValue.Bishop, color)
+        public Bishop(Party color) : base(PieceValue.Bishop, color) { }
+        
+        protected override void SetMovement()
         {
             Slides = true;
             MoveDirections = new IntVector[] { new(1, 1), new(1, -1), new(-1, -1), new(-1, 1) };
@@ -244,8 +263,9 @@ namespace TopologyChess
 
     public class Rook : Piece
     {
-        public Rook(Game game, Party color)
-            : base(game, PieceValue.Rook, color)
+        public Rook(Party color) : base(PieceValue.Rook, color) { }
+
+        protected override void SetMovement()
         {
             Slides = true;
             MoveDirections = new IntVector[] { new(0, 1), new(0, -1), new(1, 0), new(-1, 0) };
@@ -254,8 +274,9 @@ namespace TopologyChess
 
     public class Queen : Piece
     {
-        public Queen(Game game, Party color)
-            : base(game, PieceValue.Queen, color)
+        public Queen(Party color) : base(PieceValue.Queen, color) { }
+        
+        protected override void SetMovement()
         {
             Slides = true;
             MoveDirections = new IntVector[] {
@@ -267,8 +288,12 @@ namespace TopologyChess
 
     public class King : Piece
     {
-        public King(Game game, Party color)
-            : base(game, PieceValue.King, color)
+        public King(Party color) : base(PieceValue.King, color)
+        {
+            Game.Players[color].King = this;
+        }
+
+        protected override void SetMovement()
         {
             Slides = false;
             MoveDirections = new IntVector[] {

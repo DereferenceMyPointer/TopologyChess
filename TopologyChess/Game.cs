@@ -18,12 +18,20 @@ namespace TopologyChess
 {
     public partial class Game : INotifyPropertyChanged
     {
-        public Game(int size = 8)
+        private Game(int size)
         {
+            Instance = this;
             Board = new Board(size);
-            DefaultSetup();
             CurrentTopology = Topology.Topologies.FirstOrDefault(t => t.Name == "Flat");
+            DefaultSetup();
             PossibleMoves = CalculateMoves();
+        }
+
+        public static Game Instance { get; private set; }
+
+        public static void NewGame(int size = 8)
+        {
+            new Game(size);
         }
 
         private Board _board;
@@ -84,6 +92,12 @@ namespace TopologyChess
             { Party.Black, new Player(Party.Black) }
         };
 
+        // players that are controlled from this app instance
+        public List<Party> AvailibleParties { get; set; } = new()
+        {
+            Party.White, Party.Black
+        };
+
         private Party _currentParty = Party.White;
         public Party CurrentParty
         {
@@ -101,7 +115,7 @@ namespace TopologyChess
 
         public void AddPiece(PieceValue value, Party color, int x, int y)
         {
-            Piece piece = Piece.New(this, value, color);
+            Piece piece = Piece.New(value, color);
             Board[x, y].Piece = piece;
         }
 
@@ -185,14 +199,7 @@ namespace TopologyChess
         {
             Piece piece = move.MovingPiece;
             piece.HasMoved = true;
-            piece.RenderTransform.Matrix *= move.Path.Value.M;
-            if (piece.Value == PieceValue.Pawn)
-            {
-                for (int i = 0; i < piece.MoveDirections.Length; i++)
-                {
-                    piece.MoveDirections[i] = (IntVector)move.Path.Value.M.Transform((Vector)piece.MoveDirections[i]);
-                }
-            }
+            piece.RenderMatrix *= move.Path.Value.M;
             if (move.Capture != null)
             {
                 IntVector capture = (IntVector)move.Capture;
@@ -227,7 +234,7 @@ namespace TopologyChess
             if (move.MovingPiece.Value == PieceValue.Pawn &&
                 Topology.Sides(move.To + move.MovingPiece.MoveDirections[0], Board.Size).Any())
             {
-                PieceSelect promotion = new PieceSelect(this, move.MovingPiece.Color, Board[move.To]);
+                PieceSelect promotion = new PieceSelect(move.MovingPiece.Color, Board[move.To]);
                 IsBlocked = true;
                 promotion.Selected += (p) =>
                 {

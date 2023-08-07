@@ -20,6 +20,8 @@ namespace TopologyChess
         private List<Piece> pieces = new List<Piece>();
         public ReadOnlyCollection<Piece> Pieces => pieces.AsReadOnly();
 
+        public Piece King { get; set; }
+
         public void Add(Piece piece)
         {
             pieces.Add(piece);
