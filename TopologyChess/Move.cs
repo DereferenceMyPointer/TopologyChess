@@ -1,68 +1,131 @@
 ﻿using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
-/** Base class for storing moves
- * Design: moves are from one coordinate to another, or castling.
- * Moves contain a Piece, the moving piece.
- * Moves also contain a Path, the steps the piece took to move to the destination
- * Captures are also coordinates; the coordinate of the capture if one exists (maybe could just be boolean since
- * this isn't itself the set of all moves?)
- * Castling is just its own subclass that stores only the rook move (since the king move is deterministic, I guess);
- * adds an additional rook move to the move that happened which does not leave its own trace
- * 
- * Note that piece move logic is all in Game
- *      - Kind of unhinged imo but probably not necessarily a bad solution
- * Note that although this is formatted as a command pattern, the command logic is handled externally
- * 
- * TODO: Make topology change a move
- * Possibilities: 
- * Subclass
- *      - Probably not good, since there would still be coordinates, etc associated with the move
- *      - Could fix by making the other types associated with Piece nullable and adding a topology component
- *          - This would make piece move + topology change possible to implement as well
- * Superclass
- *      - Make piece moves and board transformations subclasses
- *      - Requires some refactoring of existing move code
- * 
- * Needs some additional design considerations, such as: how does the user select / submit a topology change?
- *      - I would like either drop-down + submit button, or grid, or interactable window that previews the desired topology
- * 
- */
+using System.Windows.Media;
 
 namespace TopologyChess
 {
-    public partial class Move
+    public class Move : IMove
     {
-        public IntVector From { get; set; }
-        public IntVector To { get; set; }
+        public Cell From { get; set; }
+        public Cell To { get; set; }
         public Piece MovingPiece { get; set; }
         public Chain<Step> Path { get; set; }
-        public IntVector? Capture { get; set; }
+        public Cell Capture { get; set; }
+        public Piece CapturedPiece { get; set; } = Piece.Empty;
 
         public Move() { }
         public Move(Cell from, Cell to, Chain<Step> path)
         {
-            From = from.Position;
-            To = to.Position;
+            From = from;
+            To = to;
             Path = path;
             MovingPiece = from.Piece;
-            Capture = to.Position;
+            CapturedPiece = to.Piece;
+            Capture = to;
         }
 
-        public static readonly Move NoMove = new()
+        public virtual MoveType Type { get; } = MoveType.Move;
+        public bool Legal { get; } = true;
+
+        private bool Done { get; set; } = false;
+
+        private bool init_HasMoved;
+        private Matrix init_Matrix;
+
+        public virtual void Do()
         {
-            From = new(-1, -1),
-            To = new(-1, -1),
-            Capture = null,
-            MovingPiece = null,
-            Path = null,
-            TopologyChange = null
-        };
+            init_HasMoved = MovingPiece.HasMoved;
+            init_Matrix = MovingPiece.RenderMatrix;
+
+            MovingPiece.HasMoved = true;
+            MovingPiece.RenderMatrix *= Path.Value.M;
+            if (CapturedPiece.Color != Party.None)
+            {
+                Game.Instance.Players[CapturedPiece.Color].Remove(CapturedPiece);
+                Capture.Piece = Piece.Empty;
+            }
+            From.Piece = Piece.Empty;
+            To.Piece = MovingPiece;
+            Done = true;
+        }
+
+        public virtual void Undo()
+        {
+            if (!Done) return;
+            Game game = Game.Instance;
+            MovingPiece.HasMoved = init_HasMoved;
+            MovingPiece.RenderMatrix = init_Matrix;
+
+            From.Piece = MovingPiece;
+            To.Piece = Piece.Empty;
+            if (CapturedPiece.Color != Party.None)
+            {
+                game.Players[CapturedPiece.Color].Add(CapturedPiece);
+                Capture.Piece = CapturedPiece;
+            }
+            Done = false;
+        }
+    }
+
+    public class Promotion : Move
+    {
+        public Promotion(Move move)
+        {
+            From = move.From;
+            To = move.To;
+            Path = move.Path;
+            MovingPiece = move.From.Piece;
+            CapturedPiece = move.To.Piece;
+            Capture = move.To;
+        }
+
+        public override MoveType Type { get; } = MoveType.Promotion;
+
+        public Piece PromotedPiece { get; set; }
+
+        public override void Do()
+        {
+            base.Do();
+            PieceSelect promotion_menu = new PieceSelect(MovingPiece.Color, To);
+            promotion_menu.Selected += (piece) =>
+            {
+                PromotedPiece = piece;
+                PromotedPiece.HasMoved = false;
+                PromotedPiece.RenderMatrix = MovingPiece.RenderMatrix;
+                Player player = Game.Instance.Players[MovingPiece.Color];
+                player.Remove(MovingPiece);
+                player.Add(PromotedPiece);
+                To.Piece = PromotedPiece;
+            };
+            promotion_menu.Show();
+        }
+
+        public override void Undo()
+        {
+            base.Undo();
+            Player player = Game.Instance.Players[MovingPiece.Color];
+            player.Remove(PromotedPiece);
+            player.Add(MovingPiece);
+            PromotedPiece = null;
+        }
     }
 
     public class Castle : Move
     {
         public Move RookMove { get; set; }
+        public override MoveType Type { get; } = MoveType.Castle;
+
+        public override void Do()
+        {
+            RookMove.Do();
+            base.Do();
+        }
+
+        public override void Undo()
+        {
+            base.Undo();
+            RookMove.Undo();
+        }
     }
 }

@@ -82,9 +82,9 @@ namespace TopologyChess
             }
         }
 
-        public Move LastMove { get; set; }
+        public IMove LastMove { get; set; }
 
-        public ObservableCollection<Move> History { get; set; } = new ObservableCollection<Move>();
+        public ObservableCollection<IMove> History { get; set; } = new();
 
         public Dictionary<Party, Player> Players { get; } = new()
         {
@@ -145,7 +145,6 @@ namespace TopologyChess
         public bool IsAttacked(IntVector? position, Move after = null)
         {
             if (position == null) return false;
-            after ??= Move.NoMove;
             Party color = (Party)(-(int)CurrentParty);
             foreach ((IntVector dir, bool slide) in Players[color].AttackDirections)
             {
@@ -171,9 +170,9 @@ namespace TopologyChess
                         if (piece.Color == color &&
                             piece.AttackDirections.Contains(-lead.V) &&
                             ((distance == 1) || piece.Slides) &&
-                            piece.Position != after.Capture) return true;
-                        if (lead.P == after.To) continue;
-                        if (piece.Type == PieceType.Empty || lead.P == after.From || lead.P == after.Capture)
+                            piece.Position != after?.Capture?.Position) return true;
+                        if (lead.P == after?.To.Position) continue;
+                        if (piece.Type == PieceType.Empty || lead.P == after?.From.Position || lead.P == after?.Capture?.Position)
                             stepleads.Add(lead);
                     }
                     new_stepleads.Clear();
@@ -189,65 +188,13 @@ namespace TopologyChess
             Dictionary<Cell, List<Move>> moves = new();
             foreach (var piece in Players[CurrentParty].Pieces)
             {
-                List<Move> piecemoves = piece.GetMoves(false);
+                List<Move> piecemoves = piece.GetMoves(false); //
                 if (piecemoves.Any()) moves.Add(Board[piece.Position], piecemoves);
             }
             return moves;
         }
 
-        private void Execute(Move move)
-        {
-            Piece piece = move.MovingPiece;
-            piece.HasMoved = true;
-            piece.RenderMatrix *= move.Path.Value.M;
-            if (move.Capture != null)
-            {
-                IntVector capture = (IntVector)move.Capture;
-                Piece captured = Board[capture].Piece;
-                if (captured.Color != Party.None)
-                {
-                    Players[captured.Color].Remove(captured);
-                    Board[capture].Piece = Piece.Empty;
-                }
-            }
-            Board[move.From].Piece = Piece.Empty;
-            Board[move.To].Piece = piece;
-        }
-
-
-        // if move is BoardTransformation
-        // --> Don't execute as normal, do board transform and then AfterPlay(move)
-        public void Play(Move move)
-        {
-            if (move.TopologyChange != null)
-            {
-                CurrentTopology = move.TopologyChange?.ToTopology;
-                AfterPlay(move);
-                return;
-            }
-            if (move is Castle castle)
-            {
-                Execute(castle.RookMove);
-            }
-            Execute(move);
-
-            if (move.MovingPiece.Value == PieceValue.Pawn &&
-                Topology.Sides(move.To + move.MovingPiece.MoveDirections[0], Board.Size).Any())
-            {
-                PieceSelect promotion = new PieceSelect(move.MovingPiece.Color, Board[move.To]);
-                IsBlocked = true;
-                promotion.Selected += (p) =>
-                {
-                    move.MovingPiece = p;
-                    IsBlocked = false;
-                    AfterPlay(move);
-                };
-                promotion.Show();
-            }
-            else AfterPlay(move);
-        }
-
-        private void AfterPlay(Move move)
+        public void Submit(IMove move)
         {
             LastMove = move;
             History.Add(move);

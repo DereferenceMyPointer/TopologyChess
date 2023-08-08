@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -80,19 +81,21 @@ namespace TopologyChess
 
         public bool IsClosed { get; set; } = false;
 
+        public Piece SelectedPiece { get; set; }
+
         public event Action<Piece> Selected;
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            Piece selectedPiece = ((Cell)((Button)sender).DataContext).Piece;
-            if (Type == Party.None) TargetCell.Piece = selectedPiece;
+            SelectedPiece = ((Cell)((Button)sender).DataContext).Piece;
+            if (Type == Party.None) TargetCell.Piece = SelectedPiece;
             else
             {
-                TargetCell.Piece.Value = selectedPiece.Value;
-                TargetCell.Piece.Color = selectedPiece.Color;
+                TargetCell.Piece.Value = SelectedPiece.Value;
+                TargetCell.Piece.Color = SelectedPiece.Color;
                 TargetCell.OnPropertyChanged(nameof(TargetCell.Piece));
             }
-            Selected?.Invoke(selectedPiece);
+            Selected?.Invoke(SelectedPiece);
             Selected = null;
             Close();
         }
@@ -100,45 +103,16 @@ namespace TopologyChess
         public void Show()
         {
             popup.IsOpen = true;
+            Game.Instance.IsBlocked = true;
             popup.CaptureMouse();
         }
 
         public void Close()
         {
             popup.IsOpen = false;
+            Game.Instance.IsBlocked = false;
             popup.ReleaseMouseCapture();
             IsClosed = true;
         }
     }
 }
-
-//grid.Columns = Colors.Count;
-//grid.Rows = Values.Count;
-/*int i = 0, j;
-foreach (PieceValue value in Values)
-{
-    j = 0;
-    foreach (Party color in Colors)
-    {
-        CellControl cellControl = new CellControl()
-        {
-            Cell = new Cell(i, j)
-            {
-                Piece = new Piece(value, color)
-            }
-        };
-        Button button = new Button()
-        {
-            OverridesDefaultStyle = true
-        };
-        FrameworkElementFactory factory = new FrameworkElementFactory();
-        button.Click += (sender, e) =>
-        {
-            Selected = cellControl.Cell.Piece;
-            Selected?.Invoke(this, e);
-        };
-        grid.Children.Add(cellControl);
-        j++;
-    }
-    i++;
-}*/

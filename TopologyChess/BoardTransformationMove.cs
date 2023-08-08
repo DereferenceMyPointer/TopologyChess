@@ -6,21 +6,21 @@
  */
 namespace TopologyChess
 {
-    public struct TopologyChange
+    /*public struct TopologyChange
     {
         public Topology FromTopology;
         public Topology ToTopology;
     }
-    public partial class Move
+    public class TopologyMove// : IMove
     {
 
         public TopologyChange? TopologyChange { get; set; }
 
         public class BoardTransformation : Move
         {
-            public static Move RandomBoardTransformation(Game game)
+            public static TopologyMove RandomBoardTransformation(Game game)
             {
-                Move outputMove = NoMove;
+                TopologyMove outputMove = NoMove;
                 outputMove.TopologyChange = new TopologyChange
                 {
                     FromTopology = game.CurrentTopology,
@@ -51,5 +51,5 @@ namespace TopologyChess
                 this.TopologyChange = change;
             }
         }
-    }
+    }*/
 }

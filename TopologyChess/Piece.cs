@@ -38,7 +38,8 @@ namespace TopologyChess
             Value = value;
             Game.Players[color].Add(this);
             SetMovement();
-            if (Color == Party.Black) RenderMatrix = new Matrix(-1, 0, 0, -1, 0, 0);
+            MoveDirections = new IntVector[Directions.Length];
+            RenderMatrix = (Color == Party.White) ? Matrix.Identity : new Matrix(-1, 0, 0, -1, 0, 0);
         }
 
         public static Piece New(PieceValue value, Party color)
@@ -89,14 +90,15 @@ namespace TopologyChess
             set
             {
                 RenderTransform.Matrix = value;
-                for (int i = 0; i < MoveDirections.Length; i++)
+                for (int i = 0; i < Directions.Length; i++)
                 {
-                    MoveDirections[i] = (IntVector)value.Transform((Vector)MoveDirections[i]);
+                    MoveDirections[i] = (IntVector)value.Transform((Vector)Directions[i]);
                 }
             }
         }
 
-        public IntVector[] MoveDirections { get; set; }
+        protected IntVector[] Directions { get; set; }
+        public IntVector[] MoveDirections { get; private set; }
         
         public virtual IntVector[] AttackDirections { get => MoveDirections; }
         
@@ -142,7 +144,7 @@ namespace TopologyChess
                     Cell to = Game.Board[lead.Value.P];
                     if (to.Piece.Color == Color) continue;
                     if (to.Piece.Type == PieceType.Empty) leads.Add(lead);
-                    if (!moves.Any(m => m.To == to.Position))
+                    if (!moves.Any(m => m.To == to))
                     {
                         Move move = new Move(from, to, lead);
                         if (!Game.IsAttacked(this == king ? to.Position : king.Position, move))
@@ -164,7 +166,7 @@ namespace TopologyChess
         protected override void SetMovement()
         {
             Slides = false;
-            MoveDirections = new IntVector[] { new(0, -1), new(-1, -1), new(1, -1) };
+            Directions = new IntVector[] { new(0, -1), new(-1, -1), new(1, -1) };
         }
 
         public override IntVector[] AttackDirections
@@ -188,7 +190,7 @@ namespace TopologyChess
                 {
                     push = push.Add(warp);
                     Cell to = Game.Board[push.Value.P];
-                    if (to.Piece.Type == PieceType.Empty && !moves.Any(m => m.To == to.Position))
+                    if (to.Piece.Type == PieceType.Empty && !moves.Any(m => m.To == to))
                     {
                         Move move = new Move(from, to, push);
                         if (!Game.IsAttacked(this == king ? to.Position : king.Position, move))
@@ -199,13 +201,12 @@ namespace TopologyChess
                 }
             }
             Cell enPassant = null;
-            // ERROR BANDAID FIX - IGNORE TOPOLOGY MOVE
-            if (Game.LastMove != null && Game.LastMove.TopologyChange == null &&
-                Game.LastMove.MovingPiece.Value == PieceValue.Pawn &&
-                Game.LastMove.MovingPiece.Color != Color &&
-                Game.LastMove.Path.Count() == 3)
+            if (Game.LastMove != null && Game.LastMove is Move lastmove &&
+                lastmove.MovingPiece.Value == PieceValue.Pawn &&
+                lastmove.MovingPiece.Color != Color &&
+                lastmove.Path.Count() == 3)
             {
-                enPassant = Game.Board[Game.LastMove.Path.Previous.Value.P];
+                enPassant = Game.Board[lastmove.Path.Previous.Value.P];
             }
             for (int i = 1; i <= 2; i++)
             {
@@ -221,8 +222,12 @@ namespace TopologyChess
                     if (to.Piece.Color != Color && (to.Piece.Color != Party.None || to == enPassant))
                     {
                         Move takemove = new Move(from, to, take1);
-                        if (to == enPassant) takemove.Capture = Game.LastMove.To;
-                        if (!moves.Any(m => m.To == to.Position))
+                        if (to == enPassant)
+                        {
+                            takemove.Capture = ((Move)Game.LastMove).To;
+                            takemove.CapturedPiece = ((Move)Game.LastMove).MovingPiece;
+                        }
+                        if (!moves.Any(m => m.To == to))
                         {
                             if (!Game.IsAttacked(king.Position, takemove))
                                 moves.Add(takemove);
@@ -232,7 +237,13 @@ namespace TopologyChess
                     }
                 }
             }
-            return moves;
+            List<Move> promoted = new List<Move>();
+            foreach (Move move in moves)
+            {
+                bool promote = Topology.Sides(move.To.Position + MoveDirections[0], Game.Board.Size).Any();
+                promoted.Add(promote ? new Promotion(move) : move);
+            }
+            return promoted;
         }
     }
 
@@ -243,7 +254,7 @@ namespace TopologyChess
         protected override void SetMovement()
         {
             Slides = false;
-            MoveDirections = new IntVector[] {
+            Directions = new IntVector[] {
                 new(1, 2), new(1, -2), new(-1, -2), new(-1, 2),
                 new(2, 1), new(2, -1), new(-2, -1), new(-2, 1)
             };
@@ -257,7 +268,7 @@ namespace TopologyChess
         protected override void SetMovement()
         {
             Slides = true;
-            MoveDirections = new IntVector[] { new(1, 1), new(1, -1), new(-1, -1), new(-1, 1) };
+            Directions = new IntVector[] { new(1, 1), new(1, -1), new(-1, -1), new(-1, 1) };
         }
     }
 
@@ -268,7 +279,7 @@ namespace TopologyChess
         protected override void SetMovement()
         {
             Slides = true;
-            MoveDirections = new IntVector[] { new(0, 1), new(0, -1), new(1, 0), new(-1, 0) };
+            Directions = new IntVector[] { new(0, 1), new(0, -1), new(1, 0), new(-1, 0) };
         }
     }
 
@@ -279,7 +290,7 @@ namespace TopologyChess
         protected override void SetMovement()
         {
             Slides = true;
-            MoveDirections = new IntVector[] {
+            Directions = new IntVector[] {
                 new(0, 1), new(0, -1), new(1, 0), new(-1, 0),
                 new(1, 1), new(1, -1), new(-1, -1), new(-1, 1)
             };
@@ -296,7 +307,7 @@ namespace TopologyChess
         protected override void SetMovement()
         {
             Slides = false;
-            MoveDirections = new IntVector[] {
+            Directions = new IntVector[] {
                 new(0, 1), new(0, -1), new(1, 0), new(-1, 0),
                 new(1, 1), new(1, -1), new(-1, -1), new(-1, 1)
             };
@@ -357,16 +368,16 @@ namespace TopologyChess
                             while (kpath.Previous.Previous.Previous != null) kpath = kpath.Previous;
                             Move rookMove = new Move()
                             {
-                                From = rook.Position,
-                                To = rpath.Value.P,
+                                From = Game.Board[rook.Position],
+                                To = Game.Board[rpath.Value.P],
                                 MovingPiece = rook,
                                 Path = rpath
                             };
                             if (Game.IsAttacked(kpath.Value.P, rookMove)) continue;
                             Castle castle = new Castle()
                             {
-                                From = Position,
-                                To = kpath.Value.P,
+                                From = Game.Board[Position],
+                                To = Game.Board[kpath.Value.P],
                                 MovingPiece = this,
                                 Path = kpath,
                                 RookMove = rookMove

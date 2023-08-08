@@ -8,8 +8,14 @@ namespace TopologyChess
 {
     public interface IMove
     {
+        MoveType Type { get; }
+        bool Legal { get; }
         void Do();
         void Undo();
-        void Submit();
+    }
+
+    public enum MoveType
+    {
+        TopologyChange, Move, Promotion, Castle
     }
 }

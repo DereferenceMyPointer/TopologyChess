@@ -61,6 +61,16 @@ namespace TopologyChess
             //PerspAngle = (PerspAngle + 180) % 360;
         });
 
+        private ICommand _randomTopologyCommand;
+        public ICommand RandomTopologyCommand => _randomTopologyCommand ??= new RelayCommand(parameter =>
+        {
+            /*Move desiredMove = Move.BoardTransformation.RandomBoardTransformation(Chess);
+            if (Chess != null && Chess.canTopologyMove(desiredMove.TopologyChange))
+                Chess.Play(Move.BoardTransformation.RandomBoardTransformation(Chess));
+            else
+                MessageBox.Show("Attempted Illegal Topology");*/
+        });
+
         private Cell selectedCell;
         public ICommand CellCommand => _cellCommand ??= new RelayCommand(parameter =>
         {
@@ -78,7 +88,7 @@ namespace TopologyChess
                 selectedCell = clickedCell;
                 foreach (Move move in moves)
                 {
-                    Chess.Board[move.To].Move = move;
+                    move.To.Move = move;
                 }
                 //Chess.MarkMoves(clickedCell);
             }
@@ -86,13 +96,30 @@ namespace TopologyChess
             {
                 if (clickedCell.Highlighted && selectedCell.Piece.Color == Chess.CurrentParty)
                 {
-                    Chess.Play(clickedCell.Move);
+                    clickedCell.Move.Do();
+                    AttemptedMove = clickedCell.Move;
                 }
                 selectedCell.Selected = false;
                 selectedCell = null;
                 foreach (Cell c in Chess.Board) c.Move = null;
             }
-        }, parameter => !Chess.IsBlocked);
+        }, parameter => !Chess.IsBlocked && AttemptedMove == null);
+
+        private IMove AttemptedMove { get; set; }
+
+        private ICommand _undoCommand;
+        public ICommand UndoCommand => _undoCommand ??= new RelayCommand(parameter =>
+        {
+            AttemptedMove.Undo();
+            AttemptedMove = null;
+        }, parameter => AttemptedMove != null);
+
+        private ICommand _submitCommand;
+        public ICommand SubmitCommand => _submitCommand ??= new RelayCommand(parameter =>
+        {
+            Chess.Submit(AttemptedMove);
+            AttemptedMove = null;
+        }, parameter => AttemptedMove != null);
 
         private ICommand _setPieceCommand;
         public ICommand SetPieceCommand => _setPieceCommand ??= new RelayCommand(parameter =>

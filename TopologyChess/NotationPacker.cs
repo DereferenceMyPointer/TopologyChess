@@ -10,7 +10,7 @@ using System.Collections.ObjectModel;
 
 namespace TopologyChess
 {
-    public class NotationPacker
+    /*public class NotationPacker
     {
         private Dictionary<string, Topology> _topologyDictionary;
 
@@ -77,5 +77,5 @@ namespace TopologyChess
             return moves;
         }
 
-    }
+    }*/
 }
