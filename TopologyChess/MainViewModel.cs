@@ -12,7 +12,7 @@ using System.Windows.Media.Media3D;
 
 namespace TopologyChess
 {
-    public partial class MainViewModel : INotifyPropertyChanged
+    public class MainViewModel : INotifyPropertyChanged
     {
         public MainViewModel()
         {
@@ -38,22 +38,11 @@ namespace TopologyChess
             }
         }
 
-        private string hoverCellNotation = "";
-        public string HoverCellNotation
-        {
-            get => hoverCellNotation;
-            set
-            {
-                hoverCellNotation = value;
-                OnPropertyChanged();
-            }
-        }
-
         public ICommand NewGameCommand => _newGameCommand ??= new RelayCommand(parameter => 
         {
             Game.NewGame();
             OnPropertyChanged(nameof(Chess));
-        });
+        }, parameter => Chess == null || !Chess.IsBlocked);
 
         public ICommand ClearCommand => _clearCommand ??= new RelayCommand(parameter =>
         {
@@ -70,6 +59,8 @@ namespace TopologyChess
             else
                 MessageBox.Show("Attempted Illegal Topology");*/
         });
+
+        private bool IsNotBlocked => Game.Instance == null || !Game.Instance.IsBlocked;
 
         private Cell selectedCell;
         public ICommand CellCommand => _cellCommand ??= new RelayCommand(parameter =>
@@ -103,7 +94,7 @@ namespace TopologyChess
                 selectedCell = null;
                 foreach (Cell c in Chess.Board) c.Move = null;
             }
-        }, parameter => !Chess.IsBlocked && AttemptedMove == null);
+        }, parameter => IsNotBlocked && AttemptedMove == null);
 
         private IMove AttemptedMove { get; set; }
 
@@ -112,14 +103,14 @@ namespace TopologyChess
         {
             AttemptedMove.Undo();
             AttemptedMove = null;
-        }, parameter => AttemptedMove != null);
+        }, parameter => IsNotBlocked && AttemptedMove != null);
 
         private ICommand _submitCommand;
         public ICommand SubmitCommand => _submitCommand ??= new RelayCommand(parameter =>
         {
             Chess.Submit(AttemptedMove);
             AttemptedMove = null;
-        }, parameter => AttemptedMove != null);
+        }, parameter => IsNotBlocked && AttemptedMove != null);
 
         private ICommand _setPieceCommand;
         public ICommand SetPieceCommand => _setPieceCommand ??= new RelayCommand(parameter =>

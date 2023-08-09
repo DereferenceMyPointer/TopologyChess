@@ -20,6 +20,7 @@ namespace TopologyChess
     {
         public PieceSelect(Party type, Cell target)
         {
+            Game.Instance.PieceSelect = this;
             Type = type;
             TargetCell = target;
             Cells = new List<Cell>();
@@ -54,7 +55,7 @@ namespace TopologyChess
                 {
                     Cells.Add(new Cell(i, j)
                     {
-                        Piece = value == PieceValue.None ? Piece.Empty : Piece.New(value, color)
+                        Piece = Piece.New(value, color)
                     });
                     j++;
                 }
@@ -88,13 +89,7 @@ namespace TopologyChess
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             SelectedPiece = ((Cell)((Button)sender).DataContext).Piece;
-            if (Type == Party.None) TargetCell.Piece = SelectedPiece;
-            else
-            {
-                TargetCell.Piece.Value = SelectedPiece.Value;
-                TargetCell.Piece.Color = SelectedPiece.Color;
-                TargetCell.OnPropertyChanged(nameof(TargetCell.Piece));
-            }
+            TargetCell.Piece = SelectedPiece;
             Selected?.Invoke(SelectedPiece);
             Selected = null;
             Close();
@@ -113,6 +108,7 @@ namespace TopologyChess
             Game.Instance.IsBlocked = false;
             popup.ReleaseMouseCapture();
             IsClosed = true;
+            Game.Instance.PieceSelect = null;
         }
     }
 }

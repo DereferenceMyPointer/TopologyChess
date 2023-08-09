@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Media;
 
 namespace TopologyChess
@@ -91,12 +92,11 @@ namespace TopologyChess
             promotion_menu.Selected += (piece) =>
             {
                 PromotedPiece = piece;
-                PromotedPiece.HasMoved = false;
+                PromotedPiece.HasMoved = true;
                 PromotedPiece.RenderMatrix = MovingPiece.RenderMatrix;
                 Player player = Game.Instance.Players[MovingPiece.Color];
                 player.Remove(MovingPiece);
                 player.Add(PromotedPiece);
-                To.Piece = PromotedPiece;
             };
             promotion_menu.Show();
         }

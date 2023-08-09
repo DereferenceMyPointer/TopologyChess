@@ -15,9 +15,6 @@ using System.Windows.Shapes;
 
 namespace TopologyChess
 {
-    /// <summary>
-    /// Логика взаимодействия для CellControl.xaml
-    /// </summary>
     public partial class CellControl : UserControl
     {
         public CellControl()

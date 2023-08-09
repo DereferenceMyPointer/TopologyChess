@@ -59,5 +59,19 @@ namespace TopologyChess
             }
             set => attackDirections = value;
         }
+
+        public override string ToString()
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.AppendLine(Party.ToString());
+            foreach (Piece piece in Pieces)
+            {
+                sb.Append(piece.Color.ToString()[0]);
+                sb.Append(piece.Value.ToString());
+                sb.Append(' ');
+            }
+            sb.AppendLine();
+            return sb.ToString();
+        }
     }
 }

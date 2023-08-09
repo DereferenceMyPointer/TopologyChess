@@ -36,7 +36,6 @@ namespace TopologyChess
         {
             Color = color;
             Value = value;
-            Game.Players[color].Add(this);
             SetMovement();
             MoveDirections = new IntVector[Directions.Length];
             RenderMatrix = (Color == Party.White) ? Matrix.Identity : new Matrix(-1, 0, 0, -1, 0, 0);

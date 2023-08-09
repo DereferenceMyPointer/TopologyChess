@@ -82,6 +82,8 @@ namespace TopologyChess
             }
         }
 
+        public PieceSelect PieceSelect { get; set; }
+
         public IMove LastMove { get; set; }
 
         public ObservableCollection<IMove> History { get; set; } = new();
@@ -116,6 +118,7 @@ namespace TopologyChess
         public void AddPiece(PieceValue value, Party color, int x, int y)
         {
             Piece piece = Piece.New(value, color);
+            Players[color].Add(piece);
             Board[x, y].Piece = piece;
         }
 
