@@ -1,11 +1,34 @@
 ﻿using System;
 
-/** Division of Move dedicated to topology change moves
- * 
- * 
- */
 namespace TopologyChess
 {
+    public class TopologyChange : IMove
+    {
+        public Topology From { get; set; }
+        public Topology To { get; set; }
+
+        public TopologyChange() { }
+
+        public TopologyChange(Topology from, Topology to)
+        {
+            From = from;
+            To = to;
+        }
+
+        public MoveType Type { get; } = MoveType.TopologyChange;
+        public bool Legal { get; set; } = true;
+
+        public void Do()
+        {
+            Game.Instance.CurrentTopology = To;
+        }
+
+        public void Undo()
+        {
+            Game.Instance.CurrentTopology = From;
+        }
+    }
+
     /*public struct TopologyChange
     {
         public Topology FromTopology;

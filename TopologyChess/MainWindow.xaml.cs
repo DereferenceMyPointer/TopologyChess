@@ -9,6 +9,7 @@ namespace TopologyChess
         public MainWindow()
         {
             InitializeComponent();
+            Game.Window = this;
             DataContext = new MainViewModel();
         }
     }

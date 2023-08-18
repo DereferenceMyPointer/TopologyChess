@@ -10,7 +10,7 @@
         mc:Ignorable="d"
         Title="Topology Chess" WindowStartupLocation="CenterScreen"
         d:DataContext="{d:DesignInstance local:MainViewModel, IsDesignTimeCreatable=True}"
-        Width="1000" Height="600">
+        Width="1000" Height="600" Name="mainWindow">
     <Window.Resources>
         <MatrixTransform3D x:Key="View3DTransform" Matrix="0 0 -1 0 -1 0 0 0 0 1 0 0 0 0 0 1"/>
         <!--Style x:Key="Perspective">
@@ -21,24 +21,23 @@
                 </Setter.Value>
             </Setter>
         </Style-->
-        <TextBlock x:Key="HoverNotation"/>
         <Viewbox Stretch="Uniform" x:Key="BoardVisual" x:Shared="False">
             <ItemsControl ItemsSource="{Binding Chess.Board, NotifyOnSourceUpdated=True}" Width="800" Height="800">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
                         <Button OverridesDefaultStyle="True"
-                                Command="{Binding DataContext.CellCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                Command="{Binding ElementName=mainWindow, Path=DataContext.CellCommand}"
                                 CommandParameter="{Binding}">
                             <i:Interaction.Triggers>
                                 <i:EventTrigger EventName="MouseEnter">
                                     <i:ChangePropertyAction
-                                        TargetObject="{StaticResource HoverNotation}"
+                                        TargetObject="{Binding ElementName=hoverCoord}"
                                         PropertyName="Text"
                                         Value="{Binding Notation}"/>
                                 </i:EventTrigger>
                                 <i:EventTrigger EventName="MouseLeave">
                                     <i:ChangePropertyAction
-                                        TargetObject="{StaticResource HoverNotation}"
+                                        TargetObject="{Binding ElementName=hoverCoord}"
                                         PropertyName="Text"
                                         Value=""/>
                                 </i:EventTrigger>
@@ -65,7 +64,7 @@
         </Viewbox>
     </Window.Resources>
 
-    <Grid>
+    <Grid x:Name="mainGrid">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
@@ -91,40 +90,38 @@
                       SelectedItem="{Binding Chess.CurrentTopology, NotifyOnTargetUpdated=True}"
                       DisplayMemberPath="Name"/>
         </StackPanel>
-        <StackPanel Grid.Row="1" Grid.Column="1">
-            <Viewbox>
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="1*" />
-                        <RowDefinition Height="8*"/>
-                        <RowDefinition Height="1*"/>
-                    </Grid.RowDefinitions>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="1*"/>
-                        <ColumnDefinition Width="8*"/>
-                        <ColumnDefinition Width="1*"/>
-                    </Grid.ColumnDefinitions>
-                    <Border Grid.Column="1" Grid.Row="1" ClipToBounds="True"
-                        Child="{StaticResource BoardVisual}" RenderTransformOrigin="0.5,0.5">
-                        <Border.RenderTransform>
-                            <RotateTransform Angle="{Binding PerspAngle}"/>
-                        </Border.RenderTransform>
-                    </Border>
-                    <ContentControl Grid.Row="0" Grid.Column="1"
-                                Content="{Binding Chess.CurrentTopology.UIs[0], NotifyOnSourceUpdated=True}"/>
-                    <ContentControl Grid.Row="1" Grid.Column="2"
-                                Content="{Binding Chess.CurrentTopology.UIs[1], NotifyOnSourceUpdated=True}"/>
-                    <ContentControl Grid.Row="2" Grid.Column="1"
-                                Content="{Binding Chess.CurrentTopology.UIs[2], NotifyOnSourceUpdated=True}"/>
-                    <ContentControl Grid.Row="1" Grid.Column="0"
-                                Content="{Binding Chess.CurrentTopology.UIs[3], NotifyOnSourceUpdated=True}"/>
-                    <Viewbox Grid.Row="2" Grid.Column="2">
-                        <ContentControl Content="{StaticResource HoverNotation}"/>
-                    </Viewbox>
-                </Grid>
-            </Viewbox>
-            <ContentControl Content="{Binding Chess.PieceSelect, NotifyOnSourceUpdated=True}"/>
-        </StackPanel>
+        <Viewbox Grid.Row="1" Grid.Column="1">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="1*" />
+                    <RowDefinition Height="8*"/>
+                    <RowDefinition Height="1*"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1*"/>
+                    <ColumnDefinition Width="8*"/>
+                    <ColumnDefinition Width="1*"/>
+                </Grid.ColumnDefinitions>
+                <Border Grid.Column="1" Grid.Row="1" ClipToBounds="True"
+                    Child="{StaticResource BoardVisual}" RenderTransformOrigin="0.5,0.5">
+                    <Border.RenderTransform>
+                        <RotateTransform Angle="{Binding PerspAngle}"/>
+                    </Border.RenderTransform>
+                </Border>
+                <ContentControl Grid.Row="0" Grid.Column="1"
+                            Content="{Binding Chess.CurrentTopology.UIs[0], NotifyOnSourceUpdated=True}"/>
+                <ContentControl Grid.Row="1" Grid.Column="2"
+                            Content="{Binding Chess.CurrentTopology.UIs[1], NotifyOnSourceUpdated=True}"/>
+                <ContentControl Grid.Row="2" Grid.Column="1"
+                            Content="{Binding Chess.CurrentTopology.UIs[2], NotifyOnSourceUpdated=True}"/>
+                <ContentControl Grid.Row="1" Grid.Column="0"
+                            Content="{Binding Chess.CurrentTopology.UIs[3], NotifyOnSourceUpdated=True}"/>
+                <Viewbox Grid.Row="2" Grid.Column="2">
+                    <TextBlock Name="hoverCoord"/>
+                </Viewbox>
+            </Grid>
+        </Viewbox>
+        <!--ContentControl Content="{Binding Chess.PieceSelect, NotifyOnSourceUpdated=True}"/-->
         <!--GridSplitter Grid.Row="1" Grid.Column="2" Width="20" VerticalAlignment="Stretch"/-->
         <Viewbox Grid.Row="1" Grid.Column="3" HorizontalAlignment="Center">
             <local:PreviewTrackballDecorator>

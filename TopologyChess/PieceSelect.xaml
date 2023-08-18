@@ -12,8 +12,8 @@
                 <ItemsControl ItemsSource="{Binding ElementName=pieceSelect, Path=Cells}">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
-                            <UniformGrid Columns="{Binding UGColumns, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                             Rows="{Binding UGRows, RelativeSource={RelativeSource AncestorType=UserControl}}"/>
+                            <UniformGrid Columns="{Binding ElementName=pieceSelect, Path=UGColumns}"
+                             Rows="{Binding ElementName=pieceSelect, Path=UGRows}"/>
                         </ItemsPanelTemplate>
                     </ItemsControl.ItemsPanel>
                     <ItemsControl.ItemTemplate>

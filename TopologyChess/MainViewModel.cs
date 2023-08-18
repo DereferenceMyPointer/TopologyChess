@@ -14,16 +14,11 @@ namespace TopologyChess
 {
     public class MainViewModel : INotifyPropertyChanged
     {
-        public MainViewModel()
-        {
-            Topologies = new ObservableCollection<Topology>(Topology.Topologies);
-        }
-
         private ICommand _newGameCommand;
         private ICommand _clearCommand;
         private ICommand _cellCommand;
 
-        public ObservableCollection<Topology> Topologies { get; set; }
+        public List<Topology> Topologies => Topology.Topologies;
 
         public Game Chess => Game.Instance;
 

@@ -20,7 +20,7 @@ namespace TopologyChess
     {
         public PieceSelect(Party type, Cell target)
         {
-            Game.Instance.PieceSelect = this;
+            Game.Window.mainGrid.Children.Add(this);
             Type = type;
             TargetCell = target;
             Cells = new List<Cell>();
@@ -108,7 +108,7 @@ namespace TopologyChess
             Game.Instance.IsBlocked = false;
             popup.ReleaseMouseCapture();
             IsClosed = true;
-            Game.Instance.PieceSelect = null;
+            Game.Window.mainGrid.Children.Remove(this);
         }
     }
 }

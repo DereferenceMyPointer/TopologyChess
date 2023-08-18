@@ -34,6 +34,8 @@ namespace TopologyChess
             new Game(size);
         }
 
+        public static MainWindow Window { get; set; }
+
         private Board _board;
         public Board Board
         {
@@ -82,7 +84,7 @@ namespace TopologyChess
             }
         }
 
-        public PieceSelect PieceSelect { get; set; }
+        //public PieceSelect PieceSelect { get; set; }
 
         public IMove LastMove { get; set; }
 
